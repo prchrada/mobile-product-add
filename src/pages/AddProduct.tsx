@@ -17,6 +17,9 @@ const AddProduct = () => {
         category: formData.category,
         quantity: parseInt(formData.quantity),
         imageUrl: formData.imageUrl || undefined,
+        sellerPhone: formData.sellerPhone,
+        sellerPromptPay: formData.sellerPromptPay,
+        sellerLineId: formData.sellerLineId,
       };
 
       const newProduct = saveProduct(productData);
