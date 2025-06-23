@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductFormData, Product } from '@/types/product';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +23,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     name: initialData?.name || '',
     description: initialData?.description || '',
     price: initialData?.price?.toString() || '',
-    category: initialData?.category || '',
+    category: initialData?.category || 'ทั่วไป',
     quantity: initialData?.quantity?.toString() || '',
     imageUrl: initialData?.imageUrl || '',
     sellerPhone: initialData?.sellerPhone || '',
@@ -33,17 +32,6 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
   });
 
   const [errors, setErrors] = useState<Partial<ProductFormData>>({});
-
-  const categories = [
-    'อิเล็กทรอนิกส์',
-    'เสื้อผ้า',
-    'อาหารและเครื่องดื่ม',
-    'บ้านและสวน',
-    'กีฬาและกิจกรรมกลางแจ้ง',
-    'ความงาม',
-    'หนังสือ',
-    'อื่นๆ'
-  ];
 
   const validateForm = (): boolean => {
     const newErrors: Partial<ProductFormData> = {};
@@ -58,10 +46,6 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
 
     if (!formData.price || parseFloat(formData.price) <= 0) {
       newErrors.price = 'กรุณากรอกราคาที่ถูกต้อง';
-    }
-
-    if (!formData.category) {
-      newErrors.category = 'กรุณาเลือกหมวดหมู่';
     }
 
     if (!formData.quantity || parseInt(formData.quantity) < 0) {
@@ -192,26 +176,6 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
                   className={errors.price ? 'border-red-500' : ''}
                 />
                 {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="category">หมวดหมู่ *</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value) => handleInputChange('category', value)}
-                >
-                  <SelectTrigger className={errors.category ? 'border-red-500' : ''}>
-                    <SelectValue placeholder="เลือกหมวดหมู่" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
               </div>
 
               <div>

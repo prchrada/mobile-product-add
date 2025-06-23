@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from '@/hooks/use-toast';
 import CartButton from '@/components/CartButton';
 import { Product } from '@/types/product';
@@ -18,18 +16,6 @@ const Sales = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-
-  const categories = [
-    'อิเล็กทรอนิกส์',
-    'เสื้อผ้า',
-    'อาหารและเครื่องดื่ม',
-    'บ้านและสวน',
-    'กีฬาและกิจกรรมกลางแจ้ง',
-    'ความงาม',
-    'หนังสือ',
-    'อื่นๆ'
-  ];
 
   useEffect(() => {
     loadProducts();
@@ -37,7 +23,7 @@ const Sales = () => {
 
   useEffect(() => {
     filterProducts();
-  }, [products, searchTerm, selectedCategory]);
+  }, [products, searchTerm]);
 
   const loadProducts = () => {
     const loadedProducts = getProducts().filter(product => product.quantity > 0);
@@ -52,10 +38,6 @@ const Sales = () => {
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
-    }
-
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(product => product.category === selectedCategory);
     }
 
     setFilteredProducts(filtered);
@@ -116,8 +98,8 @@ const Sales = () => {
           <CartButton />
         </div>
 
-        {/* Filters */}
-        <div className="space-y-3 mb-6">
+        {/* Search */}
+        <div className="mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
@@ -127,20 +109,6 @@ const Sales = () => {
               className="pl-10 bg-white"
             />
           </div>
-
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="bg-white">
-              <SelectValue placeholder="เลือกหมวดหมู่" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectItem value="all">หมวดหมู่ทั้งหมด</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
 
         {/* Products Grid */}
@@ -154,7 +122,7 @@ const Sales = () => {
                 {products.length === 0 ? 'ไม่มีสินค้าในสต็อก' : 'ไม่พบสินค้าที่ค้นหา'}
               </p>
               <p className="text-gray-400 text-sm">
-                {products.length === 0 ? 'เพิ่มสินค้าเพื่อเริ่มขาย' : 'ลองเปลี่ยนคำค้นหาหรือหมวดหมู่'}
+                {products.length === 0 ? 'เพิ่มสินค้าเพื่อเริ่มขาย' : 'ลองเปลี่ยนคำค้นหา'}
               </p>
             </div>
           ) : (
@@ -181,9 +149,6 @@ const Sales = () => {
                         <CardTitle className="text-lg leading-tight mb-1">
                           {product.name}
                         </CardTitle>
-                        <Badge variant="secondary" className="text-xs">
-                          {product.category}
-                        </Badge>
                       </div>
                     </div>
                   </div>

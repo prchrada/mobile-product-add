@@ -14,7 +14,7 @@ const AddProduct = () => {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
-        category: formData.category,
+        category: 'ทั่วไป', // Set default category
         quantity: parseInt(formData.quantity),
         imageUrl: formData.imageUrl || undefined,
         sellerPhone: formData.sellerPhone,
