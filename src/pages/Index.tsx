@@ -1,74 +1,113 @@
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Package, List } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { Package, Plus, ShoppingCart, ClipboardList, Users, BarChart3 } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
 
+  const menuItems = [
+    {
+      title: 'ขายสินค้า',
+      description: 'หน้าขายสินค้าและจัดการตะกร้า',
+      icon: ShoppingCart,
+      color: 'bg-green-500',
+      path: '/sales'
+    },
+    {
+      title: 'จัดการสินค้า',
+      description: 'ดูและจัดการสินค้าในคลัง',
+      icon: Package,
+      color: 'bg-blue-500',
+      path: '/products'
+    },
+    {
+      title: 'เพิ่มสินค้า',
+      description: 'เพิ่มสินค้าใหม่เข้าสู่ระบบ',
+      icon: Plus,
+      color: 'bg-purple-500',
+      path: '/add-product'
+    },
+    {
+      title: 'คำสั่งซื้อ',
+      description: 'จัดการคำสั่งซื้อและสถานะ',
+      icon: ClipboardList,
+      color: 'bg-orange-500',
+      path: '/orders'
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8 pt-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
-            <Package className="w-8 h-8 text-white" />
+          <div className="mb-4">
+            <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Package className="w-10 h-10 text-white" />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">ระบบจัดการสินค้า</h1>
-          <p className="text-gray-600">เพิ่ม แก้ไข และจัดการสินค้าของคุณ</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            ระบบจัดการสินค้า
+          </h1>
+          <p className="text-gray-600">
+            จัดการสินค้าและขายสินค้าผ่านมือถือ
+          </p>
         </div>
 
-        {/* Action Cards */}
-        <div className="space-y-4">
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center text-lg">
-                <Plus className="w-5 h-5 mr-2 text-green-600" />
-                เพิ่มสินค้าใหม่
-              </CardTitle>
-              <CardDescription>
-                เพิ่มสินค้าใหม่เข้าสู่ระบบ
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => navigate('/add-product')}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-                size="lg"
+        {/* Menu Grid */}
+        <div className="grid grid-cols-1 gap-4">
+          {menuItems.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <Card 
+                key={index} 
+                className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+                onClick={() => navigate(item.path)}
               >
-                <Plus className="w-4 h-4 mr-2" />
-                เพิ่มสินค้า
-              </Button>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center">
+                    <div className={`w-12 h-12 ${item.color} rounded-lg flex items-center justify-center mr-4`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl text-gray-900">
+                        {item.title}
+                      </CardTitle>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-gray-600 text-sm">
+                    {item.description}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Quick Stats */}
+        <div className="mt-8 grid grid-cols-2 gap-4">
+          <Card className="text-center bg-white/70 backdrop-blur-sm border-0">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-blue-600">0</div>
+              <div className="text-sm text-gray-600">สินค้าทั้งหมด</div>
             </CardContent>
           </Card>
-
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center text-lg">
-                <List className="w-5 h-5 mr-2 text-blue-600" />
-                รายการสินค้า
-              </CardTitle>
-              <CardDescription>
-                ดูและจัดการสินค้าทั้งหมด
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => navigate('/products')}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                size="lg"
-              >
-                <List className="w-4 h-4 mr-2" />
-                ดูสินค้าทั้งหมด
-              </Button>
+          <Card className="text-center bg-white/70 backdrop-blur-sm border-0">
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-green-600">0</div>
+              <div className="text-sm text-gray-600">คำสั่งซื้อ</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Footer */}
         <div className="text-center mt-12 text-gray-500 text-sm">
-          <p>ระบบจัดการสินค้าสำหรับมือถือ</p>
+          <p>ระบบจัดการสินค้าและขาย</p>
+          <p>เวอร์ชัน 1.0</p>
         </div>
       </div>
     </div>
