@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -9,12 +8,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from '@/hooks/use-toast';
 import { CartItem, OrderFormData } from '@/types/cart';
 import { getCartItems, getCartTotal, clearCart, saveOrder } from '@/utils/cartStorage';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { getProductById } from '@/utils/productStorage';
+import { ArrowLeft, Phone, CreditCard, MessageCircle } from 'lucide-react';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
+  const [sellerInfo, setSellerInfo] = useState<{
+    phone: string;
+    promptPay: string;
+    lineId: string;
+  } | null>(null);
   const [formData, setFormData] = useState<OrderFormData>({
     customerName: '',
     customerPhone: '',
@@ -31,6 +36,18 @@ const Checkout = () => {
     }
     setCartItems(items);
     setTotal(getCartTotal());
+
+    // Get seller info from the first product (assuming all products are from the same seller)
+    if (items.length > 0) {
+      const firstProduct = getProductById(items[0].productId);
+      if (firstProduct) {
+        setSellerInfo({
+          phone: firstProduct.sellerPhone,
+          promptPay: firstProduct.sellerPromptPay,
+          lineId: firstProduct.sellerLineId,
+        });
+      }
+    }
   }, [navigate]);
 
   const validateForm = (): boolean => {
@@ -133,6 +150,40 @@ const Checkout = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Seller Payment Information */}
+          {sellerInfo && (
+            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg text-blue-600">ข้อมูลการชำระเงิน</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                  <CreditCard className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="font-medium text-green-800">พร้อมเพย์</p>
+                    <p className="text-sm text-green-600">{sellerInfo.promptPay}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                  <MessageCircle className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <p className="font-medium text-blue-800">Line ID</p>
+                    <p className="text-sm text-blue-600">{sellerInfo.lineId}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <Phone className="w-5 h-5 text-gray-600" />
+                  <div>
+                    <p className="font-medium text-gray-800">เบอร์โทรผู้ขาย</p>
+                    <p className="text-sm text-gray-600">{sellerInfo.phone}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Customer Information */}
           <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
             <CardHeader>

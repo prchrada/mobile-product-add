@@ -7,6 +7,9 @@ export interface Product {
   category: string;
   quantity: number;
   imageUrl?: string;
+  sellerPhone: string;
+  sellerPromptPay: string;
+  sellerLineId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,4 +21,7 @@ export interface ProductFormData {
   category: string;
   quantity: string;
   imageUrl?: string;
+  sellerPhone: string;
+  sellerPromptPay: string;
+  sellerLineId: string;
 }

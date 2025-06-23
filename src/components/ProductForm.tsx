@@ -27,6 +27,9 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     category: initialData?.category || '',
     quantity: initialData?.quantity?.toString() || '',
     imageUrl: initialData?.imageUrl || '',
+    sellerPhone: initialData?.sellerPhone || '',
+    sellerPromptPay: initialData?.sellerPromptPay || '',
+    sellerLineId: initialData?.sellerLineId || '',
   });
 
   const [errors, setErrors] = useState<Partial<ProductFormData>>({});
@@ -63,6 +66,20 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
 
     if (!formData.quantity || parseInt(formData.quantity) < 0) {
       newErrors.quantity = 'กรุณากรอกจำนวนที่ถูกต้อง';
+    }
+
+    if (!formData.sellerPhone.trim()) {
+      newErrors.sellerPhone = 'กรุณากรอกเบอร์โทรผู้ขาย';
+    } else if (!/^[0-9]{10}$/.test(formData.sellerPhone.replace(/[- ]/g, ''))) {
+      newErrors.sellerPhone = 'กรุณากรอกเบอร์โทรให้ถูกต้อง';
+    }
+
+    if (!formData.sellerPromptPay.trim()) {
+      newErrors.sellerPromptPay = 'กรุณากรอกพร้อมเพย์ผู้ขาย';
+    }
+
+    if (!formData.sellerLineId.trim()) {
+      newErrors.sellerLineId = 'กรุณากรอก Line ID ผู้ขาย';
     }
 
     setErrors(newErrors);
@@ -209,6 +226,49 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
                   className={errors.quantity ? 'border-red-500' : ''}
                 />
                 {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>}
+              </div>
+
+              {/* Seller Information Section */}
+              <div className="pt-4 border-t border-gray-200">
+                <h3 className="text-md font-semibold text-gray-900 mb-3">ข้อมูลผู้ขาย</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="sellerPhone">เบอร์โทรผู้ขาย *</Label>
+                    <Input
+                      id="sellerPhone"
+                      value={formData.sellerPhone}
+                      onChange={(e) => handleInputChange('sellerPhone', e.target.value)}
+                      placeholder="08xxxxxxxx"
+                      className={errors.sellerPhone ? 'border-red-500' : ''}
+                    />
+                    {errors.sellerPhone && <p className="text-red-500 text-sm mt-1">{errors.sellerPhone}</p>}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="sellerPromptPay">พร้อมเพย์ผู้ขาย *</Label>
+                    <Input
+                      id="sellerPromptPay"
+                      value={formData.sellerPromptPay}
+                      onChange={(e) => handleInputChange('sellerPromptPay', e.target.value)}
+                      placeholder="เบอร์โทรหรือเลขบัตรประชาชน"
+                      className={errors.sellerPromptPay ? 'border-red-500' : ''}
+                    />
+                    {errors.sellerPromptPay && <p className="text-red-500 text-sm mt-1">{errors.sellerPromptPay}</p>}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="sellerLineId">Line ID ผู้ขาย *</Label>
+                    <Input
+                      id="sellerLineId"
+                      value={formData.sellerLineId}
+                      onChange={(e) => handleInputChange('sellerLineId', e.target.value)}
+                      placeholder="@lineid หรือ line.me/ti/p/xxxx"
+                      className={errors.sellerLineId ? 'border-red-500' : ''}
+                    />
+                    {errors.sellerLineId && <p className="text-red-500 text-sm mt-1">{errors.sellerLineId}</p>}
+                  </div>
+                </div>
               </div>
 
               <Button
