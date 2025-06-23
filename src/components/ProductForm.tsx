@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ProductFormData, Product } from '@/types/product';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
+import ImageUpload from './ImageUpload';
 
 interface ProductFormProps {
   initialData?: Product;
@@ -90,6 +92,18 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     }
   };
 
+  const handleImageChange = (imageUrl: string) => {
+    handleInputChange('imageUrl', imageUrl);
+  };
+
+  const handleImageError = (error: string) => {
+    toast({
+      title: "เกิดข้อผิดพลาด",
+      description: error,
+      variant: "destructive",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4">
       <div className="max-w-md mx-auto">
@@ -117,6 +131,12 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <ImageUpload
+                value={formData.imageUrl}
+                onChange={handleImageChange}
+                onError={handleImageError}
+              />
+
               <div>
                 <Label htmlFor="name">ชื่อสินค้า *</Label>
                 <Input
@@ -189,17 +209,6 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
                   className={errors.quantity ? 'border-red-500' : ''}
                 />
                 {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="imageUrl">URL รูปภาพ (ไม่บังคับ)</Label>
-                <Input
-                  id="imageUrl"
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) => handleInputChange('imageUrl', e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                />
               </div>
 
               <Button
