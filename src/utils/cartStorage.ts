@@ -1,4 +1,3 @@
-
 import { CartItem, Order } from '@/types/cart';
 
 const CART_KEY = 'cart';
@@ -84,12 +83,13 @@ export const getCartItemCount = (): number => {
   return cart.reduce((count, item) => count + item.quantity, 0);
 };
 
-export const saveOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>): Order => {
+export const saveOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Order => {
   try {
     const orders = getOrders();
     const newOrder: Order = {
       ...orderData,
       id: Date.now().toString(),
+      status: 'pending',
       createdAt: new Date(),
       updatedAt: new Date(),
     };

@@ -16,7 +16,7 @@ export interface Order {
   customerName: string;
   customerPhone: string;
   customerAddress: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  status?: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   createdAt: Date;
   updatedAt: Date;
 }
