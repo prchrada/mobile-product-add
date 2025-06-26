@@ -26,6 +26,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     category: initialData?.category || 'ทั่วไป',
     quantity: initialData?.quantity?.toString() || '',
     imageUrl: initialData?.imageUrl || '',
+    sellerName: initialData?.sellerName || '',
     sellerPhone: initialData?.sellerPhone || '',
     sellerPromptPay: initialData?.sellerPromptPay || '',
     sellerLineId: initialData?.sellerLineId || '',
@@ -50,6 +51,10 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
 
     if (!formData.quantity || parseInt(formData.quantity) < 0) {
       newErrors.quantity = 'กรุณากรอกจำนวนที่ถูกต้อง';
+    }
+
+    if (!formData.sellerName.trim()) {
+      newErrors.sellerName = 'กรุณากรอกชื่อผู้ขาย';
     }
 
     if (!formData.sellerPhone.trim()) {
@@ -197,6 +202,18 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
                 <h3 className="text-md font-semibold text-gray-900 mb-3">ข้อมูลผู้ขาย</h3>
                 
                 <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="sellerName">ชื่อผู้ขาย *</Label>
+                    <Input
+                      id="sellerName"
+                      value={formData.sellerName}
+                      onChange={(e) => handleInputChange('sellerName', e.target.value)}
+                      placeholder="กรอกชื่อผู้ขาย"
+                      className={errors.sellerName ? 'border-red-500' : ''}
+                    />
+                    {errors.sellerName && <p className="text-red-500 text-sm mt-1">{errors.sellerName}</p>}
+                  </div>
+
                   <div>
                     <Label htmlFor="sellerPhone">เบอร์โทรผู้ขาย *</Label>
                     <Input

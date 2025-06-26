@@ -7,6 +7,7 @@ export interface Product {
   category: string;
   quantity: number;
   imageUrl?: string;
+  sellerName: string;
   sellerPhone: string;
   sellerPromptPay: string;
   sellerLineId: string;
@@ -21,6 +22,7 @@ export interface ProductFormData {
   category: string;
   quantity: string;
   imageUrl?: string;
+  sellerName: string;
   sellerPhone: string;
   sellerPromptPay: string;
   sellerLineId: string;

@@ -109,6 +109,10 @@ const Products = () => {
         category: formData.category,
         quantity: parseInt(formData.quantity),
         imageUrl: formData.imageUrl || undefined,
+        sellerName: formData.sellerName,
+        sellerPhone: formData.sellerPhone,
+        sellerPromptPay: formData.sellerPromptPay,
+        sellerLineId: formData.sellerLineId,
       };
 
       const updatedProduct = updateProduct(editingProduct.id, updates);
