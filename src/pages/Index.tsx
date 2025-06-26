@@ -18,8 +18,8 @@ const Index = () => {
 
   const menuItems = [
     {
-      title: 'ขายสินค้า',
-      description: 'หน้าขายสินค้าและจัดการตะกร้า',
+      title: 'ซื้อสินค้า',
+      description: 'หน้าซื้อสินค้าและจัดการตะกร้า',
       icon: ShoppingCart,
       color: 'bg-green-500',
       path: '/sales'

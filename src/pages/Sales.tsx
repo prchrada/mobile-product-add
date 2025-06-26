@@ -9,7 +9,7 @@ import CartButton from '@/components/CartButton';
 import { Product } from '@/types/product';
 import { getProducts } from '@/utils/productStorage';
 import { addToCart } from '@/utils/cartStorage';
-import { ArrowLeft, Plus, Search, Package } from 'lucide-react';
+import { ArrowLeft, Plus, Search, Package, User } from 'lucide-react';
 
 const Sales = () => {
   const navigate = useNavigate();
@@ -41,6 +41,20 @@ const Sales = () => {
     }
 
     setFilteredProducts(filtered);
+  };
+
+  const groupProductsBySeller = () => {
+    const grouped: { [key: string]: Product[] } = {};
+    
+    filteredProducts.forEach(product => {
+      const sellerKey = `${product.sellerPhone}-${product.sellerLineId}`;
+      if (!grouped[sellerKey]) {
+        grouped[sellerKey] = [];
+      }
+      grouped[sellerKey].push(product);
+    });
+    
+    return grouped;
   };
 
   const handleAddToCart = (product: Product) => {
@@ -77,6 +91,8 @@ const Sales = () => {
     }).format(price);
   };
 
+  const groupedProducts = groupProductsBySeller();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 p-4">
       <div className="max-w-md mx-auto">
@@ -92,7 +108,7 @@ const Sales = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <h1 className="text-2xl font-bold text-gray-900">
-              ขายสินค้า ({filteredProducts.length})
+              ซื้อสินค้า ({filteredProducts.length})
             </h1>
           </div>
           <CartButton />
@@ -111,9 +127,9 @@ const Sales = () => {
           </div>
         </div>
 
-        {/* Products Grid */}
-        <div className="space-y-4">
-          {filteredProducts.length === 0 ? (
+        {/* Products Grouped by Seller */}
+        <div className="space-y-6">
+          {Object.keys(groupedProducts).length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Package className="w-8 h-8 text-gray-400" />
@@ -126,64 +142,84 @@ const Sales = () => {
               </p>
             </div>
           ) : (
-            filteredProducts.map((product) => (
-              <Card key={product.id} className="shadow-md border-0 bg-white">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start">
-                    <div className="flex items-center mb-2 flex-1">
-                      {product.imageUrl ? (
-                        <img
-                          src={product.imageUrl}
-                          alt={product.name}
-                          className="w-16 h-16 rounded-lg object-cover mr-3"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                          }}
-                        />
-                      ) : null}
-                      <div className={`w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mr-3 ${product.imageUrl ? 'hidden' : ''}`}>
-                        <Package className="w-8 h-8 text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg leading-tight mb-1">
-                          {product.name}
-                        </CardTitle>
-                      </div>
-                    </div>
+            Object.entries(groupedProducts).map(([sellerKey, sellerProducts]) => (
+              <div key={sellerKey} className="bg-white rounded-lg p-4 shadow-sm border">
+                {/* Seller Header */}
+                <div className="flex items-center mb-4 pb-3 border-b border-gray-100">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <User className="w-5 h-5 text-blue-600" />
                   </div>
-                </CardHeader>
-                
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {product.description}
-                  </p>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">ราคา:</span>
-                      <span className="font-bold text-green-600 text-xl">
-                        {formatPrice(product.price)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">คงเหลือ:</span>
-                      <span className="font-medium text-blue-600">
-                        {product.quantity} ชิ้น
-                      </span>
-                    </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900">ผู้ขาย</h3>
+                    <p className="text-sm text-gray-500">
+                      โทร: {sellerProducts[0].sellerPhone} | Line: {sellerProducts[0].sellerLineId}
+                    </p>
                   </div>
+                </div>
 
-                  <Button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white"
-                    disabled={product.quantity <= 0}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    เพิ่มลงตะกร้า
-                  </Button>
-                </CardContent>
-              </Card>
+                {/* Seller's Products */}
+                <div className="space-y-4">
+                  {sellerProducts.map((product) => (
+                    <Card key={product.id} className="shadow-sm border-0 bg-gray-50">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start">
+                          <div className="flex items-center mb-2 flex-1">
+                            {product.imageUrl ? (
+                              <img
+                                src={product.imageUrl}
+                                alt={product.name}
+                                className="w-16 h-16 rounded-lg object-cover mr-3"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                }}
+                              />
+                            ) : null}
+                            <div className={`w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mr-3 ${product.imageUrl ? 'hidden' : ''}`}>
+                              <Package className="w-8 h-8 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                              <CardTitle className="text-lg leading-tight mb-1">
+                                {product.name}
+                              </CardTitle>
+                            </div>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      
+                      <CardContent className="pt-0">
+                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                          {product.description}
+                        </p>
+                        
+                        <div className="space-y-2 mb-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-500">ราคา:</span>
+                            <span className="font-bold text-green-600 text-xl">
+                              {formatPrice(product.price)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-500">คงเหลือ:</span>
+                            <span className="font-medium text-blue-600">
+                              {product.quantity} ชิ้น
+                            </span>
+                          </div>
+                        </div>
+
+                        <Button
+                          onClick={() => handleAddToCart(product)}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white"
+                          disabled={product.quantity <= 0}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          เพิ่มลงตะกร้า
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             ))
           )}
         </div>
