@@ -2,14 +2,13 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ProductFormData, Product } from '@/types/product';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import ImageUpload from './ImageUpload';
+import ProductBasicInfoForm from './forms/ProductBasicInfoForm';
+import SellerInfoForm from './forms/SellerInfoForm';
+import { useProductFormValidation } from '@/hooks/useProductFormValidation';
 
 interface ProductFormProps {
   initialData?: Product;
@@ -19,6 +18,8 @@ interface ProductFormProps {
 
 const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormProps) => {
   const navigate = useNavigate();
+  const { validateForm } = useProductFormValidation(isEditing);
+  
   const [formData, setFormData] = useState<ProductFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -35,57 +36,13 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
 
   const [errors, setErrors] = useState<Partial<ProductFormData>>({});
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<ProductFormData> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'กรุณากรอกชื่อสินค้า';
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'กรุณากรอกรายละเอียด';
-    }
-
-    if (!formData.price || parseFloat(formData.price) <= 0) {
-      newErrors.price = 'กรุณากรอกราคาที่ถูกต้อง';
-    }
-
-    if (!formData.quantity || parseInt(formData.quantity) < 0) {
-      newErrors.quantity = 'กรุณากรอกจำนวนที่ถูกต้อง';
-    }
-
-    if (!formData.sellerName.trim()) {
-      newErrors.sellerName = 'กรุณากรอกชื่อผู้ขาย';
-    }
-
-    if (!formData.sellerPhone.trim()) {
-      newErrors.sellerPhone = 'กรุณากรอกเบอร์โทรผู้ขาย';
-    } else if (!/^[0-9]{10}$/.test(formData.sellerPhone.replace(/[- ]/g, ''))) {
-      newErrors.sellerPhone = 'กรุณากรอกเบอร์โทรให้ถูกต้อง';
-    }
-
-    if (!formData.sellerPromptPay.trim()) {
-      newErrors.sellerPromptPay = 'กรุณากรอกพร้อมเพย์ผู้ขาย';
-    }
-
-    if (!formData.sellerLineId.trim()) {
-      newErrors.sellerLineId = 'กรุณากรอก Line ID ผู้ขาย';
-    }
-
-    if (!formData.sellerPassword.trim()) {
-      newErrors.sellerPassword = isEditing ? 'กรุณากรอกรหัสผ่านเพื่อยืนยันตัวตน' : 'กรุณาตั้งรหัสผ่านสำหรับสินค้านี้';
-    } else if (formData.sellerPassword.length < 4) {
-      newErrors.sellerPassword = 'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (validateForm()) {
+    const validationErrors = validateForm(formData);
+    setErrors(validationErrors);
+    
+    if (Object.keys(validationErrors).length === 0) {
       onSubmit(formData);
     }
   };
@@ -144,140 +101,20 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <ImageUpload
-                value={formData.imageUrl}
-                onChange={handleImageChange}
-                onError={handleImageError}
+              <ProductBasicInfoForm
+                formData={formData}
+                errors={errors}
+                onInputChange={handleInputChange}
+                onImageChange={handleImageChange}
+                onImageError={handleImageError}
               />
 
-              <div>
-                <Label htmlFor="name">ชื่อสินค้า *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="กรอกชื่อสินค้า"
-                  className={errors.name ? 'border-red-500' : ''}
-                />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="description">รายละเอียด *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="กรอกรายละเอียดสินค้า"
-                  rows={3}
-                  className={errors.description ? 'border-red-500' : ''}
-                />
-                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="price">ราคา (บาท) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
-                  className={errors.price ? 'border-red-500' : ''}
-                />
-                {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="quantity">จำนวน *</Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  value={formData.quantity}
-                  onChange={(e) => handleInputChange('quantity', e.target.value)}
-                  placeholder="0"
-                  min="0"
-                  className={errors.quantity ? 'border-red-500' : ''}
-                />
-                {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>}
-              </div>
-
-              {/* Seller Information Section */}
-              <div className="pt-4 border-t border-gray-200">
-                <h3 className="text-md font-semibold text-gray-900 mb-3">ข้อมูลผู้ขาย</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="sellerName">ชื่อผู้ขาย *</Label>
-                    <Input
-                      id="sellerName"
-                      value={formData.sellerName}
-                      onChange={(e) => handleInputChange('sellerName', e.target.value)}
-                      placeholder="กรอกชื่อผู้ขาย"
-                      className={errors.sellerName ? 'border-red-500' : ''}
-                    />
-                    {errors.sellerName && <p className="text-red-500 text-sm mt-1">{errors.sellerName}</p>}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="sellerPhone">เบอร์โทรผู้ขาย *</Label>
-                    <Input
-                      id="sellerPhone"
-                      value={formData.sellerPhone}
-                      onChange={(e) => handleInputChange('sellerPhone', e.target.value)}
-                      placeholder="08xxxxxxxx"
-                      className={errors.sellerPhone ? 'border-red-500' : ''}
-                    />
-                    {errors.sellerPhone && <p className="text-red-500 text-sm mt-1">{errors.sellerPhone}</p>}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="sellerPromptPay">พร้อมเพย์ผู้ขาย *</Label>
-                    <Input
-                      id="sellerPromptPay"
-                      value={formData.sellerPromptPay}
-                      onChange={(e) => handleInputChange('sellerPromptPay', e.target.value)}
-                      placeholder="เบอร์โทรหรือเลขบัตรประชาชน"
-                      className={errors.sellerPromptPay ? 'border-red-500' : ''}
-                    />
-                    {errors.sellerPromptPay && <p className="text-red-500 text-sm mt-1">{errors.sellerPromptPay}</p>}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="sellerLineId">Line ID ผู้ขาย *</Label>
-                    <Input
-                      id="sellerLineId"
-                      value={formData.sellerLineId}
-                      onChange={(e) => handleInputChange('sellerLineId', e.target.value)}
-                      placeholder="@lineid หรือ line.me/ti/p/xxxx"
-                      className={errors.sellerLineId ? 'border-red-500' : ''}
-                    />
-                    {errors.sellerLineId && <p className="text-red-500 text-sm mt-1">{errors.sellerLineId}</p>}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="sellerPassword">
-                      {isEditing ? 'รหัสผ่านยืนยันตัวตน *' : 'ตั้งรหัสผ่านสำหรับสินค้า *'}
-                    </Label>
-                    <Input
-                      id="sellerPassword"
-                      type="password"
-                      value={formData.sellerPassword}
-                      onChange={(e) => handleInputChange('sellerPassword', e.target.value)}
-                      placeholder={isEditing ? 'กรอกรหัสผ่านเดิมเพื่อยืนยัน' : 'ตั้งรหัสผ่าน (อย่างน้อย 4 ตัว)'}
-                      className={errors.sellerPassword ? 'border-red-500' : ''}
-                    />
-                    {errors.sellerPassword && <p className="text-red-500 text-sm mt-1">{errors.sellerPassword}</p>}
-                    {!isEditing && (
-                      <p className="text-gray-500 text-sm mt-1">
-                        รหัสผ่านนี้จะใช้สำหรับยืนยันตัวตนเมื่อแก้ไขสินค้า
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <SellerInfoForm
+                formData={formData}
+                errors={errors}
+                onInputChange={handleInputChange}
+                isEditing={isEditing}
+              />
 
               <Button
                 type="submit"
