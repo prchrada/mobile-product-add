@@ -30,6 +30,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     sellerPhone: initialData?.sellerPhone || '',
     sellerPromptPay: initialData?.sellerPromptPay || '',
     sellerLineId: initialData?.sellerLineId || '',
+    sellerPassword: '', // Always empty for security
   });
 
   const [errors, setErrors] = useState<Partial<ProductFormData>>({});
@@ -69,6 +70,12 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
 
     if (!formData.sellerLineId.trim()) {
       newErrors.sellerLineId = 'กรุณากรอก Line ID ผู้ขาย';
+    }
+
+    if (!formData.sellerPassword.trim()) {
+      newErrors.sellerPassword = isEditing ? 'กรุณากรอกรหัสผ่านเพื่อยืนยันตัวตน' : 'กรุณาตั้งรหัสผ่านสำหรับสินค้านี้';
+    } else if (formData.sellerPassword.length < 4) {
+      newErrors.sellerPassword = 'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร';
     }
 
     setErrors(newErrors);
@@ -248,6 +255,26 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
                       className={errors.sellerLineId ? 'border-red-500' : ''}
                     />
                     {errors.sellerLineId && <p className="text-red-500 text-sm mt-1">{errors.sellerLineId}</p>}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="sellerPassword">
+                      {isEditing ? 'รหัสผ่านยืนยันตัวตน *' : 'ตั้งรหัสผ่านสำหรับสินค้า *'}
+                    </Label>
+                    <Input
+                      id="sellerPassword"
+                      type="password"
+                      value={formData.sellerPassword}
+                      onChange={(e) => handleInputChange('sellerPassword', e.target.value)}
+                      placeholder={isEditing ? 'กรอกรหัสผ่านเดิมเพื่อยืนยัน' : 'ตั้งรหัสผ่าน (อย่างน้อย 4 ตัว)'}
+                      className={errors.sellerPassword ? 'border-red-500' : ''}
+                    />
+                    {errors.sellerPassword && <p className="text-red-500 text-sm mt-1">{errors.sellerPassword}</p>}
+                    {!isEditing && (
+                      <p className="text-gray-500 text-sm mt-1">
+                        รหัสผ่านนี้จะใช้สำหรับยืนยันตัวตนเมื่อแก้ไขสินค้า
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

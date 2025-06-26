@@ -101,6 +101,16 @@ const Products = () => {
   const handleEditSubmit = (formData: ProductFormData) => {
     if (!editingProduct) return;
 
+    // Verify seller password
+    if (formData.sellerPassword !== editingProduct.sellerPassword) {
+      toast({
+        title: "รหัสผ่านไม่ถูกต้อง",
+        description: "กรุณากรอกรหัสผ่านที่ถูกต้องเพื่อยืนยันตัวตน",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const updates = {
         name: formData.name,
@@ -113,6 +123,7 @@ const Products = () => {
         sellerPhone: formData.sellerPhone,
         sellerPromptPay: formData.sellerPromptPay,
         sellerLineId: formData.sellerLineId,
+        sellerPassword: formData.sellerPassword, // Keep the same password
       };
 
       const updatedProduct = updateProduct(editingProduct.id, updates);

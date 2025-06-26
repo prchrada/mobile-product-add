@@ -21,6 +21,7 @@ const AddProduct = () => {
         sellerPhone: formData.sellerPhone,
         sellerPromptPay: formData.sellerPromptPay,
         sellerLineId: formData.sellerLineId,
+        sellerPassword: formData.sellerPassword,
       };
 
       const newProduct = saveProduct(productData);

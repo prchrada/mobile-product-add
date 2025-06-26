@@ -11,6 +11,7 @@ export interface Product {
   sellerPhone: string;
   sellerPromptPay: string;
   sellerLineId: string;
+  sellerPassword: string; // For seller verification
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,4 +27,5 @@ export interface ProductFormData {
   sellerPhone: string;
   sellerPromptPay: string;
   sellerLineId: string;
+  sellerPassword: string; // For seller verification
 }
