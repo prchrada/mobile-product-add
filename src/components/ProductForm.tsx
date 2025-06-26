@@ -20,6 +20,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
   const navigate = useNavigate();
   const { validateForm } = useProductFormValidation(isEditing);
   
+  // Initialize form data with default values or existing product data
   const [formData, setFormData] = useState<ProductFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -34,19 +35,23 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     sellerPassword: '', // Always empty for security
   });
 
+  // Track validation errors for each form field
   const [errors, setErrors] = useState<Partial<ProductFormData>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate form data using the validation hook
     const validationErrors = validateForm(formData);
     setErrors(validationErrors);
     
+    // Only submit if no validation errors
     if (Object.keys(validationErrors).length === 0) {
       onSubmit(formData);
     }
   };
 
+  // Handle input changes and clear errors
   const handleInputChange = (field: keyof ProductFormData, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -62,10 +67,12 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     }
   };
 
+  // Handle image upload
   const handleImageChange = (imageUrl: string) => {
     handleInputChange('imageUrl', imageUrl);
   };
 
+  // Handle image upload errors
   const handleImageError = (error: string) => {
     toast({
       title: "เกิดข้อผิดพลาด",
@@ -77,7 +84,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4">
       <div className="max-w-md mx-auto">
-        {/* Header */}
+        {/* Header with back button and title */}
         <div className="flex items-center mb-6 pt-4">
           <Button
             variant="ghost"
@@ -92,6 +99,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
           </h1>
         </div>
 
+        {/* Main form card */}
         <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center text-lg">
@@ -101,6 +109,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Product basic information form */}
               <ProductBasicInfoForm
                 formData={formData}
                 errors={errors}
@@ -109,6 +118,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
                 onImageError={handleImageError}
               />
 
+              {/* Seller information form */}
               <SellerInfoForm
                 formData={formData}
                 errors={errors}
@@ -116,6 +126,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
                 isEditing={isEditing}
               />
 
+              {/* Submit button */}
               <Button
                 type="submit"
                 className="w-full bg-green-600 hover:bg-green-700 text-white mt-6"
