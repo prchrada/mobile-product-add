@@ -39,12 +39,6 @@ export const useProductFormValidation = (isEditing: boolean = false) => {
       newErrors.sellerLineId = 'กรุณากรอก Line ID ผู้ขาย';
     }
 
-    if (!formData.sellerPassword.trim()) {
-      newErrors.sellerPassword = isEditing ? 'กรุณากรอกรหัสผ่านเพื่อยืนยันตัวตน' : 'กรุณาตั้งรหัสผ่านสำหรับสินค้านี้';
-    } else if (formData.sellerPassword.length < 4) {
-      newErrors.sellerPassword = 'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร';
-    }
-
     return newErrors;
   };
 

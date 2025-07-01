@@ -9,7 +9,8 @@ import ProductCard from '@/components/ProductCard';
 import ProductForm from '@/components/ProductForm';
 import { Product, ProductFormData } from '@/types/product';
 import { getProducts, deleteProduct, updateProduct } from '@/utils/productStorage';
-import { ArrowLeft, Plus, Search } from 'lucide-react';
+import { getCurrentSeller, setCurrentSeller } from '@/utils/sellerAuth';
+import { ArrowLeft, Plus, Search, Store } from 'lucide-react';
 
 const Products = () => {
   const navigate = useNavigate();
@@ -53,8 +54,18 @@ const Products = () => {
   }, [products, searchTerm, selectedCategory]);
 
   const loadProducts = () => {
-    const loadedProducts = getProducts();
-    setProducts(loadedProducts);
+    const currentSeller = getCurrentSeller();
+    if (!currentSeller) {
+      setProducts([]);
+      return;
+    }
+
+    // Filter products to show only current seller's products
+    const allProducts = getProducts();
+    const sellerProducts = allProducts.filter(product => 
+      product.sellerPhone === currentSeller.phone
+    );
+    setProducts(sellerProducts);
   };
 
   const filterProducts = () => {
@@ -101,16 +112,6 @@ const Products = () => {
   const handleEditSubmit = (formData: ProductFormData) => {
     if (!editingProduct) return;
 
-    // Verify seller password
-    if (formData.sellerPassword !== editingProduct.sellerPassword) {
-      toast({
-        title: "รหัสผ่านไม่ถูกต้อง",
-        description: "กรุณากรอกรหัสผ่านที่ถูกต้องเพื่อยืนยันตัวตน",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       const updates = {
         name: formData.name,
@@ -123,8 +124,16 @@ const Products = () => {
         sellerPhone: formData.sellerPhone,
         sellerPromptPay: formData.sellerPromptPay,
         sellerLineId: formData.sellerLineId,
-        sellerPassword: formData.sellerPassword, // Keep the same password
+        sellerPassword: editingProduct.sellerPassword, // Keep existing password
       };
+
+      // Update seller info in local storage
+      setCurrentSeller({
+        name: formData.sellerName,
+        phone: formData.sellerPhone,
+        promptPay: formData.sellerPromptPay,
+        lineId: formData.sellerLineId,
+      });
 
       const updatedProduct = updateProduct(editingProduct.id, updates);
       
@@ -150,6 +159,27 @@ const Products = () => {
     setSearchParams({});
   };
 
+  const currentSeller = getCurrentSeller();
+
+  if (!currentSeller) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <Store className="w-16 h-16 mx-auto mb-4 text-purple-400" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">ยังไม่ได้เข้าสู่ระบบ</h1>
+          <p className="text-gray-600 mb-6">กรุณาเพิ่มสินค้าแรกเพื่อเข้าสู่ระบบผู้ขาย</p>
+          <Button
+            onClick={() => navigate('/add-product')}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            เพิ่มสินค้าแรก
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (editingProduct) {
     return (
       <div>
@@ -158,11 +188,11 @@ const Products = () => {
           onSubmit={handleEditSubmit}
           isEditing={true}
         />
-        <div className="fixed bottom-4 right-4">
+        <div className="fixed bottom-6 right-6">
           <Button
             onClick={handleCancelEdit}
             variant="outline"
-            className="bg-white shadow-lg"
+            className="bg-white/90 backdrop-blur-sm shadow-lg rounded-full px-6"
           >
             ยกเลิก
           </Button>
@@ -172,47 +202,50 @@ const Products = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center mb-6 pt-4">
+        <div className="flex items-center mb-8 pt-6">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate('/')}
-            className="mr-3"
+            className="mr-3 hover:bg-white/70 rounded-full p-2"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-2xl font-bold text-gray-900 flex-1">
-            รายการสินค้า ({filteredProducts.length})
-          </h1>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              สินค้าของฉัน ({filteredProducts.length})
+            </h1>
+            <p className="text-sm text-gray-600">ผู้ขาย: {currentSeller.name}</p>
+          </div>
           <Button
             onClick={() => navigate('/add-product')}
             size="sm"
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-full shadow-lg"
           >
             <Plus className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Filters */}
-        <div className="space-y-3 mb-6">
+        <div className="space-y-4 mb-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-purple-400" />
             <Input
               placeholder="ค้นหาสินค้า..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white"
+              className="pl-12 bg-white/80 backdrop-blur-sm border-purple-200 focus:border-purple-400 rounded-2xl"
             />
           </div>
 
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="bg-white">
+            <SelectTrigger className="bg-white/80 backdrop-blur-sm border-purple-200 focus:border-purple-400 rounded-2xl">
               <SelectValue placeholder="เลือกหมวดหมู่" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
+            <SelectContent className="bg-white/90 backdrop-blur-sm border-purple-200 rounded-2xl">
               <SelectItem value="all">หมวดหมู่ทั้งหมด</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category} value={category}>
@@ -227,19 +260,19 @@ const Products = () => {
         <div className="space-y-4">
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-gray-400" />
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="w-10 h-10 text-purple-500" />
               </div>
               <p className="text-gray-500 text-lg mb-2">
                 {products.length === 0 ? 'ยังไม่มีสินค้า' : 'ไม่พบสินค้าที่ค้นหา'}
               </p>
-              <p className="text-gray-400 text-sm mb-4">
+              <p className="text-gray-400 text-sm mb-6">
                 {products.length === 0 ? 'เริ่มต้นเพิ่มสินค้าแรกของคุณ' : 'ลองเปลี่ยนคำค้นหาหรือหมวดหมู่'}
               </p>
               {products.length === 0 && (
                 <Button
                   onClick={() => navigate('/add-product')}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl px-8"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   เพิ่มสินค้าแรก

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductFormData, Product } from '@/types/product';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import ProductBasicInfoForm from './forms/ProductBasicInfoForm';
@@ -32,7 +32,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     sellerPhone: initialData?.sellerPhone || '',
     sellerPromptPay: initialData?.sellerPromptPay || '',
     sellerLineId: initialData?.sellerLineId || '',
-    sellerPassword: '', // Always empty for security
+    sellerPassword: '', // No longer needed
   });
 
   // Track validation errors for each form field
@@ -82,33 +82,33 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-4">
       <div className="max-w-md mx-auto">
         {/* Header with back button and title */}
-        <div className="flex items-center mb-6 pt-4">
+        <div className="flex items-center mb-8 pt-6">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate(-1)}
-            className="mr-3"
+            className="mr-3 hover:bg-white/70 rounded-full p-2"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             {isEditing ? 'แก้ไขสินค้า' : 'เพิ่มสินค้าใหม่'}
           </h1>
         </div>
 
         {/* Main form card */}
-        <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg">
-              <Plus className="w-5 h-5 mr-2 text-green-600" />
+        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white pb-6">
+            <CardTitle className="flex items-center text-xl justify-center">
+              <Package className="w-6 h-6 mr-3" />
               ข้อมูลสินค้า
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Product basic information form */}
               <ProductBasicInfoForm
                 formData={formData}
@@ -129,7 +129,7 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
               {/* Submit button */}
               <Button
                 type="submit"
-                className="w-full bg-green-600 hover:bg-green-700 text-white mt-6"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white mt-8 py-4 rounded-2xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                 size="lg"
               >
                 {isEditing ? 'บันทึกการแก้ไข' : 'เพิ่มสินค้า'}
