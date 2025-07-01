@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Product, ProductFormData } from '@/types/product';
 import { getProducts, deleteProduct, updateProduct } from '@/utils/productStorage';
-import { getCurrentSeller, setCurrentSeller } from '@/utils/sellerAuth';
+import { getCurrentUser } from '@/utils/userAuth';
 import { toast } from '@/hooks/use-toast';
 
 export const useProductsData = () => {
@@ -11,17 +11,18 @@ export const useProductsData = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const currentSeller = getCurrentSeller();
+  const currentUser = getCurrentUser();
 
   const loadProducts = () => {
-    if (!currentSeller) {
+    if (!currentUser) {
       setProducts([]);
       return;
     }
 
     const allProducts = getProducts();
+    // Filter products to show only seller's own products
     const sellerProducts = allProducts.filter(product => 
-      product.sellerPhone === currentSeller.phone
+      product.sellerPhone === currentUser.phone
     );
     setProducts(sellerProducts);
   };
@@ -64,6 +65,15 @@ export const useProductsData = () => {
   };
 
   const handleEditSubmit = (editingProduct: Product, formData: ProductFormData) => {
+    if (!currentUser) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "กรุณาเข้าสู่ระบบใหม่",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     try {
       const updates = {
         name: formData.name,
@@ -72,18 +82,11 @@ export const useProductsData = () => {
         category: formData.category,
         quantity: parseInt(formData.quantity),
         imageUrl: formData.imageUrl || undefined,
-        sellerName: formData.sellerName,
-        sellerPhone: formData.sellerPhone,
-        sellerPromptPay: formData.sellerPromptPay,
-        sellerLineId: formData.sellerLineId,
+        sellerName: currentUser.name,
+        sellerPhone: currentUser.phone,
+        sellerPromptPay: currentUser.promptPay || '',
+        sellerLineId: currentUser.lineId || '',
       };
-
-      setCurrentSeller({
-        name: formData.sellerName,
-        phone: formData.sellerPhone,
-        promptPay: formData.sellerPromptPay,
-        lineId: formData.sellerLineId,
-      });
 
       const updatedProduct = updateProduct(editingProduct.id, updates);
       
@@ -108,7 +111,7 @@ export const useProductsData = () => {
 
   useEffect(() => {
     loadProducts();
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     filterProducts();
@@ -119,7 +122,7 @@ export const useProductsData = () => {
     filteredProducts,
     searchTerm,
     selectedCategory,
-    currentSeller,
+    currentUser,
     setSearchTerm,
     setSelectedCategory,
     handleDelete,

@@ -4,7 +4,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AuthGuard from "./components/AuthGuard";
 import Index from "./pages/Index";
+import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
 import Products from "./pages/Products";
 import Sales from "./pages/Sales";
@@ -22,14 +24,42 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/add-product" element={<AddProduct />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/sales" element={<Sales />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/orders" element={<Orders />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={
+            <AuthGuard>
+              <Index />
+            </AuthGuard>
+          } />
+          <Route path="/add-product" element={
+            <AuthGuard requiredUserType="seller">
+              <AddProduct />
+            </AuthGuard>
+          } />
+          <Route path="/products" element={
+            <AuthGuard requiredUserType="seller">
+              <Products />
+            </AuthGuard>
+          } />
+          <Route path="/sales" element={
+            <AuthGuard requiredUserType="buyer">
+              <Sales />
+            </AuthGuard>
+          } />
+          <Route path="/cart" element={
+            <AuthGuard requiredUserType="buyer">
+              <Cart />
+            </AuthGuard>
+          } />
+          <Route path="/checkout" element={
+            <AuthGuard requiredUserType="buyer">
+              <Checkout />
+            </AuthGuard>
+          } />
+          <Route path="/orders" element={
+            <AuthGuard>
+              <Orders />
+            </AuthGuard>
+          } />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
