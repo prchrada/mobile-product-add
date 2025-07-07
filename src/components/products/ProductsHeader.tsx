@@ -2,14 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { SellerInfo } from '@/utils/sellerAuth';
+import { UserInfo } from '@/utils/userAuth';
 
 interface ProductsHeaderProps {
-  currentSeller: SellerInfo;
+  currentUser: UserInfo;
   productsCount: number;
 }
 
-const ProductsHeader = ({ currentSeller, productsCount }: ProductsHeaderProps) => {
+const ProductsHeader = ({ currentUser, productsCount }: ProductsHeaderProps) => {
   const navigate = useNavigate();
 
   return (
@@ -26,7 +26,7 @@ const ProductsHeader = ({ currentSeller, productsCount }: ProductsHeaderProps) =
         <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
           สินค้าของฉัน ({productsCount})
         </h1>
-        <p className="text-sm text-gray-600">ผู้ขาย: {currentSeller.name}</p>
+        <p className="text-sm text-gray-600">ผู้ขาย: {currentUser.name}</p>
       </div>
       <Button
         onClick={() => navigate('/add-product')}

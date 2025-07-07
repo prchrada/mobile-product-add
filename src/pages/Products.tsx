@@ -7,7 +7,6 @@ import ProductsHeader from '@/components/products/ProductsHeader';
 import ProductsFilters from '@/components/products/ProductsFilters';
 import ProductsList from '@/components/products/ProductsList';
 import ProductEditForm from '@/components/products/ProductEditForm';
-import SellerAuthGuard from '@/components/products/SellerAuthGuard';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,7 +18,7 @@ const Products = () => {
     filteredProducts,
     searchTerm,
     selectedCategory,
-    currentSeller,
+    currentUser,
     setSearchTerm,
     setSelectedCategory,
     handleDelete,
@@ -51,8 +50,15 @@ const Products = () => {
     setSearchParams({});
   };
 
-  if (!currentSeller) {
-    return <SellerAuthGuard />;
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">กรุณาเข้าสู่ระบบ</h2>
+          <p className="text-gray-500">เพื่อเข้าถึงหน้าจัดการสินค้า</p>
+        </div>
+      </div>
+    );
   }
 
   if (editingProduct) {
@@ -69,7 +75,7 @@ const Products = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-4">
       <div className="max-w-md mx-auto">
         <ProductsHeader 
-          currentSeller={currentSeller} 
+          currentUser={currentUser} 
           productsCount={filteredProducts.length} 
         />
 
