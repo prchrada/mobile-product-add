@@ -19,7 +19,7 @@ const Sales = () => {
   const groupedProducts = groupProductsBySeller();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 p-4">
       <div className="max-w-md mx-auto">
         <SalesHeader productsCount={filteredProducts.length} />
         

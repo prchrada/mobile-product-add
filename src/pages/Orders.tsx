@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Order } from '@/types/cart';
 import { getOrders } from '@/utils/cartStorage';
-import { ArrowLeft, Package } from 'lucide-react';
+import { ArrowLeft, Package, Star } from 'lucide-react';
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const Orders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 p-4">
+    <div className="min-h-screen hero-gradient p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center mb-6 pt-4">

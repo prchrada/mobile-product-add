@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { Package, Plus, ShoppingCart, ClipboardList, Eye, LogOut, User, Store } from 'lucide-react';
+import { Package, Plus, ShoppingCart, ClipboardList, Eye, LogOut, User, Store, Sparkles, TrendingUp, Heart, Star } from 'lucide-react';
 import { Product } from '@/types/product';
 import { getProducts } from '@/utils/productStorage';
 import { getCurrentUser, clearCurrentUser, isSeller, isBuyer } from '@/utils/userAuth';
@@ -51,21 +51,24 @@ const Index = () => {
       title: 'จัดการสินค้า',
       description: 'ดูและจัดการสินค้าในคลัง',
       icon: Package,
-      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
+      color: 'hero-gradient',
+      iconColor: 'text-white icon-glow',
       path: '/products'
     },
     {
       title: 'เพิ่มสินค้า',
       description: 'เพิ่มสินค้าใหม่เข้าสู่ระบบ',
-      icon: Plus,
-      color: 'bg-gradient-to-r from-purple-500 to-purple-600',
+      icon: Sparkles,
+      color: 'bg-gradient-to-r from-emerald-500 to-teal-600',
+      iconColor: 'text-white icon-glow',
       path: '/add-product'
     },
     {
       title: 'คำสั่งซื้อ',
-      description: 'จัดการคำสั่งซื้อ',
-      icon: ClipboardList,
-      color: 'bg-gradient-to-r from-orange-500 to-orange-600',
+      description: 'จัดการคำสั่งซื้อและติดตาม',
+      icon: TrendingUp,
+      color: 'bg-gradient-to-r from-orange-500 to-amber-600',
+      iconColor: 'text-white icon-glow',
       path: '/orders'
     }
   ];
@@ -74,15 +77,17 @@ const Index = () => {
     {
       title: 'ซื้อสินค้า',
       description: 'หน้าซื้อสินค้าและจัดการตะกร้า',
-      icon: ShoppingCart,
-      color: 'bg-gradient-to-r from-green-500 to-green-600',
+      icon: Heart,
+      color: 'bg-gradient-to-r from-pink-500 to-rose-600',
+      iconColor: 'text-white icon-glow',
       path: '/sales'
     },
     {
       title: 'คำสั่งซื้อ',
       description: 'ดูประวัติการสั่งซื้อ',
-      icon: ClipboardList,
-      color: 'bg-gradient-to-r from-orange-500 to-orange-600',
+      icon: Star,
+      color: 'bg-gradient-to-r from-amber-500 to-orange-600',
+      iconColor: 'text-white icon-glow',
       path: '/orders'
     }
   ];
@@ -109,70 +114,68 @@ const Index = () => {
   const UserIcon = getUserTypeIcon();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen hero-gradient p-4">
       <div className="max-w-md mx-auto">
         {/* Header with User Info */}
         <div className="text-center mb-8 pt-8">
           <div className="flex justify-between items-start mb-6">
             <div className="flex items-center">
-              <div className={`w-16 h-16 bg-gradient-to-r ${getUserTypeColor()} rounded-2xl flex items-center justify-center mr-4 shadow-lg`}>
-                <UserIcon className="w-8 h-8 text-white" />
+              <div className={`w-20 h-20 glass-card rounded-3xl flex items-center justify-center mr-4 shadow-2xl floating-animation`}>
+                <UserIcon className="w-10 h-10 text-primary icon-glow" />
               </div>
               <div className="text-left">
-                <h2 className="text-xl font-bold text-gray-900">{currentUser.name}</h2>
-                <p className="text-sm text-gray-500">
-                  {isSeller() ? 'ผู้ขาย' : 'ผู้ซื้อ'}
+                <h2 className="text-xl font-bold text-white drop-shadow-lg">{currentUser.name}</h2>
+                <p className="text-sm text-white/80 bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
+                  {isSeller() ? '✨ ผู้ขาย' : '💖 ผู้ซื้อ'}
                 </p>
-                <p className="text-xs text-gray-400">{currentUser.phone}</p>
+                <p className="text-xs text-white/60 mt-1">{currentUser.phone}</p>
               </div>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLogout}
-              className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full p-2"
+              className="text-red-400 hover:text-red-300 hover:bg-white/10 rounded-full p-3 glass-card"
             >
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
 
           <div className="mb-4">
-            <h1 className={`text-3xl font-bold bg-gradient-to-r ${getUserTypeColor()} bg-clip-text text-transparent mb-2`}>
+            <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-2">
               ระบบจัดการสินค้า
             </h1>
-            <p className="text-gray-600">
-              {isSeller() ? 'จัดการสินค้าและยอดขาย' : 'ค้นหาและซื้อสินค้าที่ต้องการ'}
+            <p className="text-white/80 text-lg bg-white/10 px-6 py-2 rounded-full backdrop-blur-sm">
+              {isSeller() ? '🎯 จัดการสินค้าและยอดขาย' : '🛍️ ค้นหาและซื้อสินค้าที่ต้องการ'}
             </p>
           </div>
         </div>
 
         {/* Menu Grid */}
-        <div className="grid grid-cols-1 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-6 mb-8">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             return (
               <Card 
                 key={index} 
-                className="shadow-xl border-0 bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 rounded-2xl overflow-hidden"
+                className="glass-card hover:shadow-2xl cursor-pointer card-hover rounded-3xl overflow-hidden border-white/30"
                 onClick={() => navigate(item.path)}
               >
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-4">
                   <div className="flex items-center">
-                    <div className={`w-14 h-14 ${item.color} rounded-xl flex items-center justify-center mr-4 shadow-lg`}>
-                      <Icon className="w-7 h-7 text-white" />
+                    <div className={`w-16 h-16 ${item.color} rounded-2xl flex items-center justify-center mr-4 shadow-xl`}>
+                      <Icon className={`w-8 h-8 ${item.iconColor}`} />
                     </div>
                     <div>
-                      <CardTitle className="text-xl text-gray-900">
+                      <CardTitle className="text-xl text-gray-900 mb-1">
                         {item.title}
                       </CardTitle>
+                      <p className="text-gray-600 text-sm">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-sm">
-                    {item.description}
-                  </p>
-                </CardContent>
               </Card>
             );
           })}
@@ -181,49 +184,49 @@ const Index = () => {
         {/* Products Preview */}
         {products.length > 0 && (
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">
-                {isSeller() ? 'สินค้าของคุณ' : 'สินค้าแนะนำ'}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white drop-shadow-lg">
+                {isSeller() ? '🎨 สินค้าของคุณ' : '⭐ สินค้าแนะนำ'}
               </h2>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(isSeller() ? '/products' : '/sales')}
-                className="text-blue-600 hover:text-blue-800"
+                className="text-white hover:text-white/80 glass-card"
               >
                 <Eye className="w-4 h-4 mr-1" />
                 ดูทั้งหมด
               </Button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {products.map((product) => (
-                <Card key={product.id} className="shadow-lg border-0 bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden">
-                  <CardContent className="p-4">
+                <Card key={product.id} className="glass-card rounded-3xl overflow-hidden border-white/30 card-hover">
+                  <CardContent className="p-5">
                     <div className="flex items-center">
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
                           alt={product.name}
-                          className="w-14 h-14 rounded-xl object-cover mr-3 shadow-md"
+                          className="w-16 h-16 rounded-2xl object-cover mr-4 shadow-lg"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
                             e.currentTarget.nextElementSibling?.classList.remove('hidden');
                           }}
                         />
                       ) : null}
-                      <div className={`w-14 h-14 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center mr-3 ${product.imageUrl ? 'hidden' : ''}`}>
-                        <Package className="w-7 h-7 text-blue-600" />
+                      <div className={`w-16 h-16 hero-gradient rounded-2xl flex items-center justify-center mr-4 shadow-lg ${product.imageUrl ? 'hidden' : ''}`}>
+                        <Package className="w-8 h-8 text-white icon-glow" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 text-sm">
+                        <h3 className="font-semibold text-gray-900 text-base mb-1">
                           {product.name}
                         </h3>
-                        <p className="text-green-600 font-bold text-sm">
+                        <p className="text-emerald-600 font-bold text-lg">
                           {formatPrice(product.price)}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-blue-600 font-semibold text-sm">
+                        <p className="text-primary font-semibold text-sm bg-primary/10 px-3 py-1 rounded-full">
                           {product.quantity} ชิ้น
                         </p>
                       </div>
@@ -236,29 +239,29 @@ const Index = () => {
         )}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <Card className="text-center bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-lg">
-            <CardContent className="pt-6">
-              <div className={`text-2xl font-bold bg-gradient-to-r ${getUserTypeColor()} bg-clip-text text-transparent`}>
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <Card className="text-center glass-card border-white/30 rounded-3xl shadow-xl card-hover">
+            <CardContent className="pt-8 pb-6">
+              <div className="text-3xl font-bold gradient-text mb-2">
                 {isSeller() ? products.length : getProducts().length}
               </div>
-              <div className="text-sm text-gray-600">
-                {isSeller() ? 'สินค้าของคุณ' : 'สินค้าทั้งหมด'}
+              <div className="text-sm text-gray-700 font-medium">
+                {isSeller() ? '🎯 สินค้าของคุณ' : '🛍️ สินค้าทั้งหมด'}
               </div>
             </CardContent>
           </Card>
-          <Card className="text-center bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-lg">
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-orange-600">0</div>
-              <div className="text-sm text-gray-600">คำสั่งซื้อ</div>
+          <Card className="text-center glass-card border-white/30 rounded-3xl shadow-xl card-hover">
+            <CardContent className="pt-8 pb-6">
+              <div className="text-3xl font-bold text-amber-600 mb-2">0</div>
+              <div className="text-sm text-gray-700 font-medium">⭐ คำสั่งซื้อ</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-12 text-gray-500 text-sm">
-          <p>ระบบจัดการสินค้าและขาย</p>
-          <p>เวอร์ชัน 2.0</p>
+        <div className="text-center mt-12 text-white/60 text-sm">
+          <p className="mb-1">✨ ระบบจัดการสินค้าและขาย</p>
+          <p>เวอร์ชัน 2.0 🚀</p>
         </div>
       </div>
     </div>

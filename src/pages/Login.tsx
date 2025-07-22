@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
-import { Store, ShoppingCart, User, Phone, Mail, CreditCard, MessageSquare } from 'lucide-react';
+import { Store, ShoppingCart, User, Phone, Mail, CreditCard, MessageSquare, Heart, Sparkles, Crown, Star } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { setCurrentUser, UserInfo } from '@/utils/userAuth';
 
@@ -68,48 +68,58 @@ const Login = () => {
 
   if (!userType) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 flex items-center justify-center">
+      <div className="min-h-screen hero-gradient p-4 flex items-center justify-center">
         <div className="max-w-md mx-auto">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-10 h-10 text-white" />
+          <div className="text-center mb-12">
+            <div className="w-24 h-24 glass-card rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl floating-animation">
+              <User className="w-12 h-12 text-primary icon-glow" />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-              เลือกประเภทผู้ใช้งาน
+            <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-3">
+              ยินดีต้อนรับ! 🎉
             </h1>
-            <p className="text-gray-600">กรุณาเลือกว่าคุณต้องการใช้งานในฐานะอะไร</p>
+            <p className="text-white/80 text-lg bg-white/10 px-6 py-2 rounded-full backdrop-blur-sm">
+              กรุณาเลือกประเภทผู้ใช้งาน
+            </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             <Card 
-              className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-400"
+              className="glass-card cursor-pointer card-hover rounded-3xl overflow-hidden border-white/30 group"
               onClick={() => setUserType('buyer')}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-8">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                    <ShoppingCart className="w-6 h-6 text-blue-600" />
+                  <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mr-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                    <Heart className="w-8 h-8 text-white icon-glow" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900">ผู้ซื้อ</h3>
-                    <p className="text-gray-600 text-sm">ซื้อสินค้าและจัดการตะกร้า</p>
+                    <h3 className="font-bold text-xl text-gray-900 mb-1">💖 ผู้ซื้อ</h3>
+                    <p className="text-gray-600">ค้นหาและซื้อสินค้าที่ชื่นชอบ</p>
+                    <div className="flex items-center mt-2 text-pink-600">
+                      <Star className="w-4 h-4 mr-1" />
+                      <span className="text-sm">เริ่มช็อปปิ้งได้เลย!</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card 
-              className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-purple-400"
+              className="glass-card cursor-pointer card-hover rounded-3xl overflow-hidden border-white/30 group"
               onClick={() => setUserType('seller')}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-8">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                    <Store className="w-6 h-6 text-purple-600" />
+                  <div className="w-16 h-16 hero-gradient rounded-2xl flex items-center justify-center mr-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                    <Crown className="w-8 h-8 text-white icon-glow" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900">ผู้ขาย</h3>
-                    <p className="text-gray-600 text-sm">เพิ่มและจัดการสินค้า</p>
+                    <h3 className="font-bold text-xl text-gray-900 mb-1">✨ ผู้ขาย</h3>
+                    <p className="text-gray-600">เพิ่มและจัดการสินค้าของคุณ</p>
+                    <div className="flex items-center mt-2 text-purple-600">
+                      <Sparkles className="w-4 h-4 mr-1" />
+                      <span className="text-sm">สร้างร้านค้าออนไลน์!</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -121,47 +131,43 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 flex items-center justify-center">
+    <div className="min-h-screen hero-gradient p-4 flex items-center justify-center">
       <div className="max-w-md mx-auto">
-        <div className="text-center mb-8">
-          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
-            userType === 'seller' 
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600' 
-              : 'bg-gradient-to-r from-blue-600 to-green-600'
-          }`}>
+        <div className="text-center mb-12">
+          <div className={`w-24 h-24 glass-card rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl floating-animation`}>
             {userType === 'seller' ? (
-              <Store className="w-10 h-10 text-white" />
+              <Crown className="w-12 h-12 text-primary icon-glow" />
             ) : (
-              <ShoppingCart className="w-10 h-10 text-white" />
+              <Heart className="w-12 h-12 text-primary icon-glow" />
             )}
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            ลงทะเบียน{userType === 'seller' ? 'ผู้ขาย' : 'ผู้ซื้อ'}
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-3">
+            {userType === 'seller' ? '✨ ลงทะเบียนผู้ขาย' : '💖 ลงทะเบียนผู้ซื้อ'}
           </h1>
           <Button
             variant="ghost"
             onClick={() => setUserType(null)}
-            className="text-sm text-gray-500 hover:text-gray-700"
+            className="text-white/80 hover:text-white hover:bg-white/10 glass-card"
           >
             ← เปลี่ยนประเภทผู้ใช้
           </Button>
         </div>
 
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg rounded-3xl">
+        <Card className="glass-card border-white/30 rounded-3xl shadow-2xl overflow-hidden">
           <CardHeader className={`text-white pb-6 ${
             userType === 'seller'
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-              : 'bg-gradient-to-r from-blue-500 to-green-500'
+              ? 'hero-gradient'
+              : 'bg-gradient-to-r from-pink-500 to-rose-600'
           }`}>
-            <CardTitle className="text-center text-xl">
-              ข้อมูลส่วนตัว
+            <CardTitle className="text-center text-xl font-bold">
+              📝 ข้อมูลส่วนตัว
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="name" className="flex items-center text-gray-700 mb-2">
-                  <User className="w-4 h-4 mr-2" />
+                <Label htmlFor="name" className="flex items-center text-gray-700 mb-3 font-medium">
+                  <User className="w-5 h-5 mr-2 text-primary" />
                   ชื่อ-นามสกุล
                 </Label>
                 <Input
@@ -169,14 +175,14 @@ const Login = () => {
                   type="text"
                   value={formData.name}
                   onChange={handleInputChange('name')}
-                  className="rounded-xl border-gray-200 focus:border-purple-400"
+                  className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
                   placeholder="กรอกชื่อ-นามสกุล"
                 />
               </div>
 
               <div>
-                <Label htmlFor="phone" className="flex items-center text-gray-700 mb-2">
-                  <Phone className="w-4 h-4 mr-2" />
+                <Label htmlFor="phone" className="flex items-center text-gray-700 mb-3 font-medium">
+                  <Phone className="w-5 h-5 mr-2 text-primary" />
                   เบอร์โทรศัพท์
                 </Label>
                 <Input
@@ -184,14 +190,14 @@ const Login = () => {
                   type="tel"
                   value={formData.phone}
                   onChange={handleInputChange('phone')}
-                  className="rounded-xl border-gray-200 focus:border-purple-400"
+                  className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
                   placeholder="08x-xxx-xxxx"
                 />
               </div>
 
               <div>
-                <Label htmlFor="email" className="flex items-center text-gray-700 mb-2">
-                  <Mail className="w-4 h-4 mr-2" />
+                <Label htmlFor="email" className="flex items-center text-gray-700 mb-3 font-medium">
+                  <Mail className="w-5 h-5 mr-2 text-primary" />
                   อีเมล
                 </Label>
                 <Input
@@ -199,54 +205,62 @@ const Login = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange('email')}
-                  className="rounded-xl border-gray-200 focus:border-purple-400"
+                  className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
                   placeholder="example@email.com"
                 />
               </div>
 
               {userType === 'seller' && (
                 <>
-                  <div>
-                    <Label htmlFor="promptPay" className="flex items-center text-gray-700 mb-2">
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      พร้อมเพย์
-                    </Label>
-                    <Input
-                      id="promptPay"
-                      type="text"
-                      value={formData.promptPay}
-                      onChange={handleInputChange('promptPay')}
-                      className="rounded-xl border-gray-200 focus:border-purple-400"
-                      placeholder="เบอร์โทรหรือ ID Card สำหรับพร้อมเพย์"
-                    />
-                  </div>
+                  <div className="bg-purple-50 p-4 rounded-2xl border border-purple-200">
+                    <h3 className="text-sm font-bold text-purple-700 mb-3 flex items-center">
+                      <Crown className="w-4 h-4 mr-2" />
+                      ข้อมูลผู้ขาย
+                    </h3>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="promptPay" className="flex items-center text-gray-700 mb-2 font-medium text-sm">
+                          <CreditCard className="w-4 h-4 mr-2 text-green-600" />
+                          พร้อมเพย์
+                        </Label>
+                        <Input
+                          id="promptPay"
+                          type="text"
+                          value={formData.promptPay}
+                          onChange={handleInputChange('promptPay')}
+                          className="rounded-xl border-purple-200 focus:border-purple-400 h-10"
+                          placeholder="เบอร์โทรหรือ ID Card"
+                        />
+                      </div>
 
-                  <div>
-                    <Label htmlFor="lineId" className="flex items-center text-gray-700 mb-2">
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Line ID
-                    </Label>
-                    <Input
-                      id="lineId"
-                      type="text"
-                      value={formData.lineId}
-                      onChange={handleInputChange('lineId')}
-                      className="rounded-xl border-gray-200 focus:border-purple-400"
-                      placeholder="Line ID สำหรับติดต่อ"
-                    />
+                      <div>
+                        <Label htmlFor="lineId" className="flex items-center text-gray-700 mb-2 font-medium text-sm">
+                          <MessageSquare className="w-4 h-4 mr-2 text-green-600" />
+                          Line ID
+                        </Label>
+                        <Input
+                          id="lineId"
+                          type="text"
+                          value={formData.lineId}
+                          onChange={handleInputChange('lineId')}
+                          className="rounded-xl border-purple-200 focus:border-purple-400 h-10"
+                          placeholder="Line ID สำหรับติดต่อ"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </>
               )}
 
               <Button
                 type="submit"
-                className={`w-full py-4 rounded-2xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${
+                className={`w-full py-6 rounded-3xl text-xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 ${
                   userType === 'seller'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
-                    : 'bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700'
+                    ? 'hero-gradient hover:scale-105'
+                    : 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 hover:scale-105'
                 } text-white`}
               >
-                เริ่มใช้งาน
+                {userType === 'seller' ? '🚀 เริ่มขายสินค้า' : '🎉 เริ่มช็อปปิ้ง'}
               </Button>
             </form>
           </CardContent>
