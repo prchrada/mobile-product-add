@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
 import { Store, ShoppingCart, User, Phone, Mail, CreditCard, MessageSquare, Heart, Sparkles, Crown, Star } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { setCurrentUser, UserInfo } from '@/utils/userAuth';
+import { signUp, signIn, UserInfo } from '@/utils/userAuth';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,14 +16,15 @@ const Login = () => {
     name: '',
     phone: '',
     email: '',
+    password: '',
     promptPay: '',
     lineId: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.phone || !formData.email) {
+    if (!formData.name || !formData.phone || !formData.email || !formData.password) {
       toast({
         title: "กรุณากรอกข้อมูลให้ครบถ้วน",
         variant: "destructive",
@@ -39,21 +40,28 @@ const Login = () => {
       return;
     }
 
-    const user: UserInfo = {
-      id: Date.now().toString(),
+    const profileData: Omit<UserInfo, 'id' | 'email'> = {
       name: formData.name,
       phone: formData.phone,
-      email: formData.email,
       userType: userType!,
       promptPay: userType === 'seller' ? formData.promptPay : undefined,
       lineId: userType === 'seller' ? formData.lineId : undefined,
     };
 
-    setCurrentUser(user);
+    const { error } = await signUp(formData.email, formData.password, profileData);
+
+    if (error) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
 
     toast({
       title: "ลงทะเบียนสำเร็จ!",
-      description: `ยินดีต้อนรับ ${user.name}`,
+      description: `ยินดีต้อนรับ ${profileData.name}`,
     });
 
     navigate('/');
@@ -207,6 +215,21 @@ const Login = () => {
                   onChange={handleInputChange('email')}
                   className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
                   placeholder="example@email.com"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="password" className="flex items-center text-gray-700 mb-3 font-medium">
+                  <User className="w-5 h-5 mr-2 text-primary" />
+                  รหัสผ่าน
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleInputChange('password')}
+                  className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
+                  placeholder="รหัสผ่าน"
                 />
               </div>
 

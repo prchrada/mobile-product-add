@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Package, Plus, ShoppingCart, ClipboardList, Eye, LogOut, User, Store, Sparkles, TrendingUp, Heart, Star } from 'lucide-react';
 import { Product } from '@/types/product';
 import { getProducts } from '@/utils/productStorage';
-import { getCurrentUser, clearCurrentUser, isSeller, isBuyer } from '@/utils/userAuth';
+import { getCurrentUser, signOut, isSeller, isBuyer } from '@/utils/userAuth';
 import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -33,8 +33,8 @@ const Index = () => {
     }
   }, [currentUser, navigate]);
 
-  const handleLogout = () => {
-    clearCurrentUser();
+  const handleLogout = async () => {
+    await signOut();
     toast({
       title: "ออกจากระบบสำเร็จ",
       description: "ขออภัยที่ต้องจากลา",

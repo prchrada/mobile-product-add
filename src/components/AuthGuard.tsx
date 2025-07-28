@@ -1,7 +1,7 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getCurrentUser, isSeller, isBuyer } from '@/utils/userAuth';
+import { getCurrentUser, getCurrentSession, isSeller, isBuyer, initializeAuth } from '@/utils/userAuth';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -11,9 +11,22 @@ interface AuthGuardProps {
 const AuthGuard = ({ children, requiredUserType }: AuthGuardProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentUser = getCurrentUser();
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const initialize = async () => {
+      await initializeAuth();
+      setCurrentUser(getCurrentUser());
+      setIsLoading(false);
+    };
+    
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
     // If no user is logged in, redirect to login
     if (!currentUser) {
       navigate('/login');
@@ -31,7 +44,16 @@ const AuthGuard = ({ children, requiredUserType }: AuthGuardProps) => {
         return;
       }
     }
-  }, [currentUser, requiredUserType, navigate, location.pathname]);
+  }, [currentUser, requiredUserType, navigate, location.pathname, isLoading]);
+
+  // Show loading while initializing
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-pink-600">
+        <div className="text-white text-lg">กำลังโหลด...</div>
+      </div>
+    );
+  }
 
   // Don't render children if user is not authenticated or doesn't have required permissions
   if (!currentUser) {

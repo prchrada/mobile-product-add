@@ -1,5 +1,6 @@
 
-const CURRENT_USER_KEY = 'currentUser';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 export interface UserInfo {
   id: string;
@@ -12,34 +13,119 @@ export interface UserInfo {
   lineId?: string;
 }
 
-export const setCurrentUser = (user: UserInfo) => {
-  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-};
+let currentUser: UserInfo | null = null;
+let currentSession: Session | null = null;
 
-export const getCurrentUser = (): UserInfo | null => {
+// Initialize auth state
+supabase.auth.onAuthStateChange(async (event, session) => {
+  currentSession = session;
+  if (session?.user) {
+    await fetchUserProfile(session.user.id);
+  } else {
+    currentUser = null;
+  }
+});
+
+const fetchUserProfile = async (userId: string) => {
   try {
-    const user = localStorage.getItem(CURRENT_USER_KEY);
-    return user ? JSON.parse(user) : null;
-  } catch {
-    return null;
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (profile) {
+      currentUser = {
+        id: profile.id,
+        name: profile.name,
+        phone: profile.phone,
+        email: currentSession?.user?.email || '',
+        userType: profile.user_type as 'buyer' | 'seller',
+        promptPay: profile.prompt_pay || undefined,
+        lineId: profile.line_id || undefined,
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    currentUser = null;
   }
 };
 
-export const clearCurrentUser = () => {
-  localStorage.removeItem(CURRENT_USER_KEY);
+export const signUp = async (email: string, password: string, profileData: Omit<UserInfo, 'id' | 'email'>) => {
+  const redirectUrl = `${window.location.origin}/`;
+  
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: redirectUrl
+    }
+  });
+
+  if (error) return { error };
+
+  // Create profile after successful signup
+  if (data.user) {
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        user_id: data.user.id,
+        name: profileData.name,
+        phone: profileData.phone,
+        user_type: profileData.userType,
+        prompt_pay: profileData.promptPay,
+        line_id: profileData.lineId,
+      });
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
+      return { error: profileError };
+    }
+  }
+
+  return { data, error: null };
+};
+
+export const signIn = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  return { data, error };
+};
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut();
+  currentUser = null;
+  currentSession = null;
+  return { error };
+};
+
+export const getCurrentUser = (): UserInfo | null => {
+  return currentUser;
+};
+
+export const getCurrentSession = (): Session | null => {
+  return currentSession;
 };
 
 export const isCurrentUser = (userPhone: string): boolean => {
-  const currentUser = getCurrentUser();
   return currentUser?.phone === userPhone;
 };
 
 export const isSeller = (): boolean => {
-  const currentUser = getCurrentUser();
   return currentUser?.userType === 'seller';
 };
 
 export const isBuyer = (): boolean => {
-  const currentUser = getCurrentUser();
   return currentUser?.userType === 'buyer';
+};
+
+// Initialize session on app start
+export const initializeAuth = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  currentSession = session;
+  if (session?.user) {
+    await fetchUserProfile(session.user.id);
+  }
 };
