@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductFormData, Product } from '@/types/product';
-import { ArrowLeft, Plus, Package } from 'lucide-react';
+import { ArrowLeft, Plus, Package, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import ProductBasicInfoForm from './forms/ProductBasicInfoForm';
-import SellerInfoForm from './forms/SellerInfoForm';
 import { useProductFormValidation } from '@/hooks/useProductFormValidation';
+import { getCurrentUser } from '@/utils/userAuth';
 
 interface ProductFormProps {
   initialData?: Product;
@@ -19,6 +19,7 @@ interface ProductFormProps {
 const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormProps) => {
   const navigate = useNavigate();
   const { validateForm } = useProductFormValidation(isEditing);
+  const currentUser = getCurrentUser();
   
   // Initialize form data with default values or existing product data
   const [formData, setFormData] = useState<ProductFormData>({
@@ -28,10 +29,10 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     category: initialData?.category || 'ทั่วไป',
     quantity: initialData?.quantity?.toString() || '',
     imageUrl: initialData?.imageUrl || '',
-    sellerName: initialData?.sellerName || '',
-    sellerPhone: initialData?.sellerPhone || '',
-    sellerPromptPay: initialData?.sellerPromptPay || '',
-    sellerLineId: initialData?.sellerLineId || '',
+    sellerName: currentUser?.name || initialData?.sellerName || '',
+    sellerPhone: currentUser?.phone || initialData?.sellerPhone || '',
+    sellerPromptPay: currentUser?.promptPay || initialData?.sellerPromptPay || '',
+    sellerLineId: currentUser?.lineId || initialData?.sellerLineId || '',
     sellerPassword: '', // No longer needed
   });
 
@@ -118,13 +119,39 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
                 onImageError={handleImageError}
               />
 
-              {/* Seller information form */}
-              <SellerInfoForm
-                formData={formData}
-                errors={errors}
-                onInputChange={handleInputChange}
-                isEditing={isEditing}
-              />
+              {/* Show seller info (read-only) */}
+              {currentUser && (
+                <div className="pt-6 border-t border-purple-200">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                    <User className="w-5 h-5 mr-2 text-purple-600" />
+                    ข้อมูลผู้ขาย
+                  </h3>
+                  <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-600">ชื่อ:</span>
+                        <p className="font-medium text-gray-800">{currentUser.name}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">เบอร์:</span>
+                        <p className="font-medium text-gray-800">{currentUser.phone}</p>
+                      </div>
+                      {currentUser.promptPay && (
+                        <div>
+                          <span className="text-gray-600">พร้อมเพย์:</span>
+                          <p className="font-medium text-gray-800">{currentUser.promptPay}</p>
+                        </div>
+                      )}
+                      {currentUser.lineId && (
+                        <div>
+                          <span className="text-gray-600">Line ID:</span>
+                          <p className="font-medium text-gray-800">{currentUser.lineId}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Submit button */}
               <Button
