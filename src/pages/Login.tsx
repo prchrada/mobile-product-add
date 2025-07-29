@@ -179,7 +179,7 @@ const Login = () => {
               <div className="text-center">
                 <Label className="flex items-center justify-center text-gray-700 mb-3 font-medium">
                   <Camera className="w-5 h-5 mr-2 text-primary" />
-                  รูปโปรไฟล์
+                  {userType === 'seller' ? 'รูปภาพผู้ขาย' : 'รูปภาพผู้ซื้อ'}
                 </Label>
                 <div className="flex justify-center">
                   <ImageUpload
