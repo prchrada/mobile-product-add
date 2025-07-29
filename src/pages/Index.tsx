@@ -119,18 +119,29 @@ const Index = () => {
         {/* Header with User Info */}
         <div className="text-center mb-8 pt-8">
           <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center">
-              <div className={`w-20 h-20 glass-card rounded-3xl flex items-center justify-center mr-4 shadow-2xl floating-animation`}>
-                <UserIcon className="w-10 h-10 text-primary icon-glow" />
-              </div>
-              <div className="text-left">
-                <h2 className="text-xl font-bold text-white drop-shadow-lg">{currentUser.name}</h2>
-                <p className="text-sm text-white/80 bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
-                  {isSeller() ? '✨ ผู้ขาย' : '💖 ผู้ซื้อ'}
-                </p>
-                <p className="text-xs text-white/60 mt-1">{currentUser.phone}</p>
-              </div>
+          <div className="flex items-center">
+            {currentUser.avatarUrl ? (
+              <img
+                src={currentUser.avatarUrl}
+                alt={`รูปโปรไฟล์ของ ${currentUser.name}`}
+                className="w-20 h-20 rounded-3xl object-cover mr-4 shadow-2xl floating-animation border-4 border-white/30"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+            ) : null}
+            <div className={`w-20 h-20 glass-card rounded-3xl flex items-center justify-center mr-4 shadow-2xl floating-animation ${currentUser.avatarUrl ? 'hidden' : ''}`}>
+              <UserIcon className="w-10 h-10 text-primary icon-glow" />
             </div>
+            <div className="text-left">
+              <h2 className="text-xl font-bold text-white drop-shadow-lg">{currentUser.name}</h2>
+              <p className="text-sm text-white/80 bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
+                {isSeller() ? '✨ ผู้ขาย' : '💖 ผู้ซื้อ'}
+              </p>
+              <p className="text-xs text-white/60 mt-1">{currentUser.phone}</p>
+            </div>
+          </div>
             <Button
               variant="ghost"
               size="sm"
