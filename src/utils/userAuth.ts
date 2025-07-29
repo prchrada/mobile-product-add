@@ -8,6 +8,7 @@ export interface UserInfo {
   phone: string;
   email: string;
   userType: 'buyer' | 'seller';
+  avatarUrl?: string;
   // Seller specific fields
   promptPay?: string;
   lineId?: string;
@@ -41,6 +42,7 @@ const fetchUserProfile = async (userId: string) => {
         phone: profile.phone,
         email: currentSession?.user?.email || '',
         userType: profile.user_type as 'buyer' | 'seller',
+        avatarUrl: undefined, // Will be available after migration
         promptPay: profile.prompt_pay || undefined,
         lineId: profile.line_id || undefined,
       };
@@ -84,6 +86,39 @@ export const signUp = async (email: string, password: string, profileData: Omit<
   }
 
   return { data, error: null };
+};
+
+export const signInWithNameAndPhone = async (name: string, phone: string) => {
+  try {
+    // Find user by name and phone (without avatar_url for now)
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('user_id, name, phone, user_type, prompt_pay, line_id')
+      .eq('name', name)
+      .eq('phone', phone)
+      .single();
+
+    if (error || !profile) {
+      return { error: { message: 'ไม่พบผู้ใช้ที่ตรงกับชื่อและเบอร์โทรที่ระบุ' } };
+    }
+
+    // Set current user manually since we're doing a quick login
+    currentUser = {
+      id: profile.user_id,
+      name: profile.name,
+      phone: profile.phone,
+      email: '', // We'll set this later when needed
+      userType: profile.user_type as 'buyer' | 'seller',
+      avatarUrl: undefined, // Will be available after migration
+      promptPay: profile.prompt_pay || undefined,
+      lineId: profile.line_id || undefined,
+    };
+
+    return { data: profile, error: null };
+  } catch (error) {
+    console.error('Error signing in with name and phone:', error);
+    return { error: { message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' } };
+  }
 };
 
 export const signIn = async (email: string, password: string) => {
