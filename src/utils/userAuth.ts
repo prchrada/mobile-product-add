@@ -31,7 +31,7 @@ const fetchUserProfile = async (userId: string) => {
   try {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id, user_id, name, phone, user_type, avatar_url, prompt_pay, line_id')
+      .select('id, user_id, name, phone, user_type, prompt_pay, line_id')
       .eq('user_id', userId)
       .single();
     
@@ -42,7 +42,7 @@ const fetchUserProfile = async (userId: string) => {
         phone: profile.phone,
         email: currentSession?.user?.email || '',
         userType: profile.user_type as 'buyer' | 'seller',
-        avatarUrl: profile.avatar_url || undefined,
+        avatarUrl: undefined, // Will be available after migration
         promptPay: profile.prompt_pay || undefined,
         lineId: profile.line_id || undefined,
       };
@@ -75,7 +75,6 @@ export const signUp = async (email: string, password: string, profileData: Omit<
         name: profileData.name,
         phone: profileData.phone,
         user_type: profileData.userType,
-        avatar_url: profileData.avatarUrl,
         prompt_pay: profileData.promptPay,
         line_id: profileData.lineId,
       });
@@ -94,7 +93,7 @@ export const signInWithNameAndPhone = async (name: string, phone: string) => {
     // Find user by name and phone
     const { data: profile, error } = await supabase
       .from('profiles')
-      .select('user_id, name, phone, user_type, avatar_url, prompt_pay, line_id')
+      .select('user_id, name, phone, user_type, prompt_pay, line_id')
       .eq('name', name)
       .eq('phone', phone)
       .single();
@@ -110,7 +109,7 @@ export const signInWithNameAndPhone = async (name: string, phone: string) => {
       phone: profile.phone,
       email: '', // We'll set this later when needed
       userType: profile.user_type as 'buyer' | 'seller',
-      avatarUrl: profile.avatar_url || undefined,
+      avatarUrl: undefined, // Will be available after migration
       promptPay: profile.prompt_pay || undefined,
       lineId: profile.line_id || undefined,
     };
