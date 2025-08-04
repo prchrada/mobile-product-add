@@ -5,8 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
-import { Store, ShoppingCart, User, Phone, Mail, CreditCard, MessageSquare, Heart, Sparkles, Crown, Star, Camera } from 'lucide-react';
-import ImageUpload from '@/components/ImageUpload';
+import { Store, ShoppingCart, User, Phone, Mail, CreditCard, MessageSquare, Heart, Sparkles, Crown, Star } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { signUp, signIn, signInWithNameAndPhone, UserInfo } from '@/utils/userAuth';
 
@@ -20,8 +19,7 @@ const Login = () => {
     email: '',
     password: '',
     promptPay: '',
-    lineId: '',
-    avatarUrl: ''
+    lineId: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,7 +74,6 @@ const Login = () => {
         name: formData.name,
         phone: formData.phone,
         userType: userType!,
-        avatarUrl: formData.avatarUrl,
         promptPay: userType === 'seller' ? formData.promptPay : undefined,
         lineId: userType === 'seller' ? formData.lineId : undefined,
       };
@@ -84,9 +81,19 @@ const Login = () => {
       const { error } = await signUp(formData.email, formData.password, profileData);
 
       if (error) {
+        let errorMessage = "เกิดข้อผิดพลาดในการลงทะเบียน";
+        
+        if (error.message.includes("User already registered") || error.message.includes("already registered")) {
+          errorMessage = "อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่นหรือเข้าสู่ระบบ";
+        } else if (error.message.includes("Invalid email")) {
+          errorMessage = "รูปแบบอีเมลไม่ถูกต้อง";
+        } else if (error.message.includes("Password")) {
+          errorMessage = "รหัสผ่านไม่ถูกต้อง กรุณาใช้รหัสผ่านที่มีความยาวอย่างน้อย 6 ตัวอักษร";
+        }
+        
         toast({
-          title: "เกิดข้อผิดพลาด",
-          description: error.message,
+          title: "ลงทะเบียนไม่สำเร็จ",
+          description: errorMessage,
           variant: "destructive",
         });
         return;
@@ -305,24 +312,6 @@ const Login = () => {
           </CardHeader>
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Avatar Upload */}
-              <div className="text-center">
-                <Label className="flex items-center justify-center text-gray-700 mb-3 font-medium">
-                  <Camera className="w-5 h-5 mr-2 text-primary" />
-                  {userType === 'seller' ? 'รูปภาพผู้ขาย' : 'รูปภาพผู้ซื้อ'}
-                </Label>
-                <div className="flex justify-center">
-                  <ImageUpload
-                    value={formData.avatarUrl}
-                    onChange={(url) => setFormData(prev => ({ ...prev, avatarUrl: url }))}
-                    onError={(error) => toast({
-                      title: "เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ",
-                      description: error,
-                      variant: "destructive",
-                    })}
-                  />
-                </div>
-              </div>
 
               <div>
                 <Label htmlFor="name" className="flex items-center text-gray-700 mb-3 font-medium">
