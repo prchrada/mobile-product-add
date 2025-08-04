@@ -316,7 +316,7 @@ const Login = () => {
                     value={formData.avatarUrl}
                     onChange={(url) => setFormData(prev => ({ ...prev, avatarUrl: url }))}
                     onError={(error) => toast({
-                      title: "เกิดข้อผิดพลาด",
+                      title: "เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ",
                       description: error,
                       variant: "destructive",
                     })}
