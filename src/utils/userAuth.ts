@@ -31,18 +31,18 @@ const fetchUserProfile = async (userId: string) => {
   try {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id, user_id, name, phone, user_type, prompt_pay, line_id')
+      .select('*')
       .eq('user_id', userId)
       .single();
     
     if (profile) {
       currentUser = {
-        id: profile.id,
+        id: profile.user_id,
         name: profile.name,
         phone: profile.phone,
         email: currentSession?.user?.email || '',
         userType: profile.user_type as 'buyer' | 'seller',
-        avatarUrl: undefined, // Will be available after migration
+        avatarUrl: profile.avatar_url || undefined,
         promptPay: profile.prompt_pay || undefined,
         lineId: profile.line_id || undefined,
       };
@@ -60,32 +60,19 @@ export const signUp = async (email: string, password: string, profileData: Omit<
     email,
     password,
     options: {
-      emailRedirectTo: redirectUrl
-    }
-  });
-
-  if (error) return { error };
-
-  // Create profile after successful signup
-  if (data.user) {
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        user_id: data.user.id,
+      emailRedirectTo: redirectUrl,
+      data: {
         name: profileData.name,
         phone: profileData.phone,
         user_type: profileData.userType,
         prompt_pay: profileData.promptPay,
         line_id: profileData.lineId,
-      });
-
-    if (profileError) {
-      console.error('Error creating profile:', profileError);
-      return { error: profileError };
+        avatar_url: profileData.avatarUrl,
+      }
     }
-  }
+  });
 
-  return { data, error: null };
+  return { data, error };
 };
 
 export const signInWithNameAndPhone = async (name: string, phone: string) => {
@@ -93,7 +80,7 @@ export const signInWithNameAndPhone = async (name: string, phone: string) => {
     // Find user by name and phone
     const { data: profile, error } = await supabase
       .from('profiles')
-      .select('user_id, name, phone, user_type, prompt_pay, line_id')
+      .select('*')
       .eq('name', name)
       .eq('phone', phone)
       .single();
@@ -109,7 +96,7 @@ export const signInWithNameAndPhone = async (name: string, phone: string) => {
       phone: profile.phone,
       email: '', // We'll set this later when needed
       userType: profile.user_type as 'buyer' | 'seller',
-      avatarUrl: undefined, // Will be available after migration
+      avatarUrl: profile.avatar_url || undefined,
       promptPay: profile.prompt_pay || undefined,
       lineId: profile.line_id || undefined,
     };

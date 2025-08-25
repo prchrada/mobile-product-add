@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import ProductForm from '@/components/ProductForm';
 import { ProductFormData } from '@/types/product';
-import { saveProduct } from '@/utils/productStorage';
+import { saveProduct } from '@/utils/productSupabase';
 import { getCurrentUser } from '@/utils/userAuth';
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
 
-  const handleSubmit = (formData: ProductFormData) => {
+  const handleSubmit = async (formData: ProductFormData) => {
     if (!currentUser) {
       toast({
         title: "เกิดข้อผิดพลาด",
@@ -23,27 +23,26 @@ const AddProduct = () => {
 
     try {
       const productData = {
+        user_id: currentUser.id,
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
         category: 'ทั่วไป',
         quantity: parseInt(formData.quantity),
-        imageUrl: formData.imageUrl || undefined,
-        sellerName: currentUser.name,
-        sellerPhone: currentUser.phone,
-        sellerPromptPay: currentUser.promptPay || '',
-        sellerLineId: currentUser.lineId || '',
-        sellerPassword: currentUser.phone,
+        image_url: formData.imageUrl || null,
       };
 
-      const newProduct = saveProduct(productData);
+      const newProduct = await saveProduct(productData);
       
-      toast({
-        title: "เพิ่มสินค้าสำเร็จ!",
-        description: `เพิ่มสินค้า "${newProduct.name}" เรียบร้อยแล้ว`,
-      });
-
-      navigate('/products');
+      if (newProduct) {
+        toast({
+          title: "เพิ่มสินค้าสำเร็จ!",
+          description: `เพิ่มสินค้า "${newProduct.name}" เรียบร้อยแล้ว`,
+        });
+        navigate('/products');
+      } else {
+        throw new Error('Failed to save product');
+      }
     } catch (error) {
       console.error('Error saving product:', error);
       toast({

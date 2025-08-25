@@ -1,9 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { Product, ProductFormData } from '@/types/product';
-import { getProducts, deleteProduct, updateProduct } from '@/utils/productStorage';
+import { ProductFormData } from '@/types/product';
+import { getUserProducts, deleteProduct, updateProduct } from '@/utils/productSupabase';
 import { getCurrentUser } from '@/utils/userAuth';
 import { toast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+
+type Product = Database['public']['Tables']['products']['Row'];
 
 export const useProductsData = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -13,18 +16,14 @@ export const useProductsData = () => {
 
   const currentUser = getCurrentUser();
 
-  const loadProducts = () => {
+  const loadProducts = async () => {
     if (!currentUser) {
       setProducts([]);
       return;
     }
 
-    const allProducts = getProducts();
-    // Filter products to show only seller's own products
-    const sellerProducts = allProducts.filter(product => 
-      product.sellerPhone === currentUser.phone
-    );
-    setProducts(sellerProducts);
+    const userProducts = await getUserProducts(currentUser.id);
+    setProducts(userProducts);
   };
 
   const filterProducts = () => {
@@ -44,9 +43,9 @@ export const useProductsData = () => {
     setFilteredProducts(filtered);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     try {
-      const success = deleteProduct(id);
+      const success = await deleteProduct(id);
       if (success) {
         loadProducts();
         toast({
@@ -64,7 +63,7 @@ export const useProductsData = () => {
     }
   };
 
-  const handleEditSubmit = (editingProduct: Product, formData: ProductFormData) => {
+  const handleEditSubmit = async (editingProduct: Product, formData: ProductFormData) => {
     if (!currentUser) {
       toast({
         title: "เกิดข้อผิดพลาด",
@@ -81,14 +80,10 @@ export const useProductsData = () => {
         price: parseFloat(formData.price),
         category: formData.category,
         quantity: parseInt(formData.quantity),
-        imageUrl: formData.imageUrl || undefined,
-        sellerName: currentUser.name,
-        sellerPhone: currentUser.phone,
-        sellerPromptPay: currentUser.promptPay || '',
-        sellerLineId: currentUser.lineId || '',
+        image_url: formData.imageUrl,
       };
 
-      const updatedProduct = updateProduct(editingProduct.id, updates);
+      const updatedProduct = await updateProduct(editingProduct.id, updates);
       
       if (updatedProduct) {
         loadProducts();
