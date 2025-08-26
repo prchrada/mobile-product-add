@@ -97,7 +97,12 @@ const Login = () => {
         description: `ยินดีต้อนรับ ${profileData.name}`,
       });
 
-      navigate('/');
+      // Navigate to appropriate page based on user type
+      if (userType === 'seller') {
+        navigate('/products');
+      } else {
+        navigate('/sales');
+      }
     }
   };
 
