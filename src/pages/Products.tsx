@@ -1,13 +1,15 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Product } from '@/types/product';
+import type { Database } from '@/integrations/supabase/types';
 import { Package } from 'lucide-react';
 import { useProductsData } from '@/hooks/useProductsData';
 import ProductsHeader from '@/components/products/ProductsHeader';
 import ProductsFilters from '@/components/products/ProductsFilters';
 import ProductsList from '@/components/products/ProductsList';
 import ProductEditForm from '@/components/products/ProductEditForm';
+
+type Product = Database['public']['Tables']['products']['Row'];
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
