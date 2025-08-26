@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from '@/hooks/use-toast';
 import { CartItem, OrderFormData } from '@/types/cart';
 import { getCartItems, getCartTotal, clearCart, saveOrder } from '@/utils/cartStorage';
-import { getProductById } from '@/utils/productStorage';
+import { getProductById } from '@/utils/productSupabase';
 import { ArrowLeft, Phone, CreditCard, MessageCircle } from 'lucide-react';
 
 const Checkout = () => {
@@ -39,16 +39,24 @@ const Checkout = () => {
     setTotal(getCartTotal());
 
     // Get seller info from the first product (assuming all products are from the same seller)
-    if (items.length > 0) {
-      const firstProduct = getProductById(items[0].productId);
-      if (firstProduct) {
-        setSellerInfo({
-          phone: 'ไม่ระบุ',
-          promptPay: 'ไม่ระบุ',
-          lineId: 'ไม่ระบุ',
-        });
+    const loadSellerInfo = async () => {
+      if (items.length > 0) {
+        try {
+          const firstProduct = await getProductById(items[0].productId);
+          if (firstProduct) {
+            setSellerInfo({
+              phone: 'ไม่ระบุ',
+              promptPay: 'ไม่ระบุ',
+              lineId: 'ไม่ระบุ',
+            });
+          }
+        } catch (error) {
+          console.error('Error loading product:', error);
+        }
       }
-    }
+    };
+
+    loadSellerInfo();
   }, [navigate]);
 
   const validateForm = (): boolean => {

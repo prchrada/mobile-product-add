@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { Package, Plus, ShoppingCart, ClipboardList, Eye, LogOut, User, Store, Sparkles, TrendingUp, Heart, Star } from 'lucide-react';
 import { Product } from '@/types/product';
-import { getProducts } from '@/utils/productStorage';
+import { getProducts } from '@/utils/productSupabase';
 import { getCurrentUser, signOut, isSeller, isBuyer } from '@/utils/userAuth';
 import { toast } from '@/hooks/use-toast';
 
@@ -20,17 +20,30 @@ const Index = () => {
       return;
     }
 
-    const loadedProducts = getProducts();
-    // If seller, show only their products
-    if (isSeller()) {
-      const sellerProducts = loadedProducts.filter(product => 
-        product.user_id === currentUser.id
-      ).slice(0, 3);
-      setProducts(sellerProducts);
-    } else {
-      // If buyer, show all available products
-      setProducts(loadedProducts.slice(0, 3));
-    }
+    const loadProducts = async () => {
+      try {
+        const loadedProducts = await getProducts();
+        // If seller, show only their products
+        if (isSeller()) {
+          const sellerProducts = loadedProducts.filter(product => 
+            product.user_id === currentUser.id
+          ).slice(0, 3);
+          setProducts(sellerProducts);
+        } else {
+          // If buyer, show all available products
+          setProducts(loadedProducts.slice(0, 6));
+        }
+      } catch (error) {
+        console.error('Error loading products:', error);
+        toast({
+          title: "เกิดข้อผิดพลาด",
+          description: "ไม่สามารถโหลดข้อมูลสินค้าได้",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    loadProducts();
   }, [currentUser, navigate]);
 
   const handleLogout = async () => {
@@ -254,7 +267,7 @@ const Index = () => {
           <Card className="text-center glass-card border-white/30 rounded-3xl shadow-xl card-hover">
             <CardContent className="pt-8 pb-6">
               <div className="text-3xl font-bold gradient-text mb-2">
-                {isSeller() ? products.length : getProducts().length}
+                {isSeller() ? products.length : products.length}
               </div>
               <div className="text-sm text-gray-700 font-medium">
                 {isSeller() ? '🎯 สินค้าของคุณ' : '🛍️ สินค้าทั้งหมด'}

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Product } from '@/types/product';
-import { getProducts } from '@/utils/productStorage';
+import { getProducts } from '@/utils/productSupabase';
 import { addToCart } from '@/utils/cartStorage';
 import { toast } from '@/hooks/use-toast';
 
@@ -18,9 +18,14 @@ export const useSalesData = () => {
     filterProducts();
   }, [products, searchTerm]);
 
-  const loadProducts = () => {
-    const loadedProducts = getProducts().filter(product => product.quantity > 0);
-    setProducts(loadedProducts);
+  const loadProducts = async () => {
+    try {
+      const allProducts = await getProducts();
+      const availableProducts = allProducts.filter(product => product.quantity > 0);
+      setProducts(availableProducts);
+    } catch (error) {
+      console.error('Error loading products:', error);
+    }
   };
 
   const filterProducts = () => {
