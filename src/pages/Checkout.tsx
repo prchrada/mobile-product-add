@@ -43,9 +43,9 @@ const Checkout = () => {
       const firstProduct = getProductById(items[0].productId);
       if (firstProduct) {
         setSellerInfo({
-          phone: firstProduct.sellerPhone,
-          promptPay: firstProduct.sellerPromptPay,
-          lineId: firstProduct.sellerLineId,
+          phone: 'ไม่ระบุ',
+          promptPay: 'ไม่ระบุ',
+          lineId: 'ไม่ระบุ',
         });
       }
     }

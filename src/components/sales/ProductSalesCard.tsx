@@ -16,9 +16,9 @@ const ProductSalesCard = ({ product, onAddToCart, formatPrice }: ProductSalesCar
       <CardHeader className="pb-3">
         <div className="flex items-start">
           <div className="flex items-center mb-2 flex-1">
-            {product.imageUrl ? (
+            {product.image_url ? (
               <img
-                src={product.imageUrl}
+                src={product.image_url}
                 alt={product.name}
                 className="w-16 h-16 rounded-lg object-cover mr-3"
                 onError={(e) => {
@@ -27,7 +27,7 @@ const ProductSalesCard = ({ product, onAddToCart, formatPrice }: ProductSalesCar
                 }}
               />
             ) : null}
-            <div className={`w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mr-3 ${product.imageUrl ? 'hidden' : ''}`}>
+            <div className={`w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mr-3 ${product.image_url ? 'hidden' : ''}`}>
               <Package className="w-8 h-8 text-green-600" />
             </div>
             <div className="flex-1">

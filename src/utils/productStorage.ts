@@ -18,8 +18,8 @@ export const saveProduct = (product: Omit<Product, 'id' | 'createdAt' | 'updated
   const newProduct: Product = {
     ...product,
     id: Date.now().toString(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   };
   
   products.push(newProduct);
@@ -36,7 +36,7 @@ export const updateProduct = (id: string, updates: Partial<Product>): Product | 
   products[index] = {
     ...products[index],
     ...updates,
-    updatedAt: new Date(),
+    updated_at: new Date().toISOString(),
   };
   
   localStorage.setItem(STORAGE_KEY, JSON.stringify(products));

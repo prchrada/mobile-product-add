@@ -40,7 +40,7 @@ export const useSalesData = () => {
     const grouped: { [key: string]: Product[] } = {};
     
     filteredProducts.forEach(product => {
-      const sellerKey = `${product.sellerName}-${product.sellerPhone}`;
+      const sellerKey = product.user_id; // Use user_id as key
       if (!grouped[sellerKey]) {
         grouped[sellerKey] = [];
       }
@@ -55,7 +55,7 @@ export const useSalesData = () => {
       addToCart({
         productId: product.id,
         productName: product.name,
-        productImage: product.imageUrl,
+        productImage: product.image_url,
         price: product.price,
         quantity: 1,
       });

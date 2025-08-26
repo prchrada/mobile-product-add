@@ -1,6 +1,6 @@
 
 // Use Supabase types for consistency
-export type { Database } from '@/integrations/supabase/types';
+import type { Database } from '@/integrations/supabase/types';
 
 export type Product = Database['public']['Tables']['products']['Row'];
 export type ProductInsert = Database['public']['Tables']['products']['Insert'];

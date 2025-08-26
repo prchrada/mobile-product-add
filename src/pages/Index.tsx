@@ -24,7 +24,7 @@ const Index = () => {
     // If seller, show only their products
     if (isSeller()) {
       const sellerProducts = loadedProducts.filter(product => 
-        product.sellerPhone === currentUser.phone
+        product.user_id === currentUser.id
       ).slice(0, 3);
       setProducts(sellerProducts);
     } else {
@@ -214,9 +214,9 @@ const Index = () => {
                 <Card key={product.id} className="glass-card rounded-3xl overflow-hidden border-white/30 card-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center">
-                      {product.imageUrl ? (
+                      {product.image_url ? (
                         <img
-                          src={product.imageUrl}
+                          src={product.image_url}
                           alt={product.name}
                           className="w-16 h-16 rounded-2xl object-cover mr-4 shadow-lg"
                           onError={(e) => {
@@ -225,7 +225,7 @@ const Index = () => {
                           }}
                         />
                       ) : null}
-                      <div className={`w-16 h-16 hero-gradient rounded-2xl flex items-center justify-center mr-4 shadow-lg ${product.imageUrl ? 'hidden' : ''}`}>
+                      <div className={`w-16 h-16 hero-gradient rounded-2xl flex items-center justify-center mr-4 shadow-lg ${product.image_url ? 'hidden' : ''}`}>
                         <Package className="w-8 h-8 text-white icon-glow" />
                       </div>
                       <div className="flex-1">

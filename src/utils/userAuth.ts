@@ -42,7 +42,7 @@ const fetchUserProfile = async (userId: string) => {
         phone: profile.phone,
         email: currentSession?.user?.email || '',
         userType: profile.user_type as 'buyer' | 'seller',
-        avatarUrl: profile.avatar_url || undefined,
+        avatarUrl: undefined, // Will be available after avatar_url migration
         promptPay: profile.prompt_pay || undefined,
         lineId: profile.line_id || undefined,
       };
@@ -96,7 +96,7 @@ export const signInWithNameAndPhone = async (name: string, phone: string) => {
       phone: profile.phone,
       email: '', // We'll set this later when needed
       userType: profile.user_type as 'buyer' | 'seller',
-      avatarUrl: profile.avatar_url || undefined,
+      avatarUrl: undefined, // Will be available after avatar_url migration
       promptPay: profile.prompt_pay || undefined,
       lineId: profile.line_id || undefined,
     };

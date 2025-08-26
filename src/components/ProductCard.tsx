@@ -44,9 +44,9 @@ const ProductCard = ({ product, onEdit, onDelete }: ProductCardProps) => {
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <div className="flex items-center mb-3">
-                {product.imageUrl ? (
+                {product.image_url ? (
                   <img
-                    src={product.imageUrl}
+                    src={product.image_url}
                     alt={product.name}
                     className="w-16 h-16 rounded-2xl object-cover mr-4 shadow-md"
                     onError={(e) => {
@@ -55,7 +55,7 @@ const ProductCard = ({ product, onEdit, onDelete }: ProductCardProps) => {
                     }}
                   />
                 ) : null}
-                <div className={`w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mr-4 ${product.imageUrl ? 'hidden' : ''}`}>
+                <div className={`w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mr-4 ${product.image_url ? 'hidden' : ''}`}>
                   <Package className="w-8 h-8 text-purple-600" />
                 </div>
                 <div className="flex-1">
@@ -109,7 +109,7 @@ const ProductCard = ({ product, onEdit, onDelete }: ProductCardProps) => {
           </Button>
 
           <div className="mt-3 text-xs text-gray-400 text-center">
-            เพิ่มเมื่อ: {new Date(product.createdAt).toLocaleDateString('th-TH')}
+            เพิ่มเมื่อ: {new Date(product.created_at).toLocaleDateString('th-TH')}
           </div>
         </CardContent>
       </Card>

@@ -28,11 +28,11 @@ const ProductForm = ({ initialData, onSubmit, isEditing = false }: ProductFormPr
     price: initialData?.price?.toString() || '',
     category: initialData?.category || 'ทั่วไป',
     quantity: initialData?.quantity?.toString() || '',
-    imageUrl: initialData?.imageUrl || '',
-    sellerName: currentUser?.name || initialData?.sellerName || '',
-    sellerPhone: currentUser?.phone || initialData?.sellerPhone || '',
-    sellerPromptPay: currentUser?.promptPay || initialData?.sellerPromptPay || '',
-    sellerLineId: currentUser?.lineId || initialData?.sellerLineId || '',
+    imageUrl: initialData?.image_url || '',
+    sellerName: currentUser?.name || '',
+    sellerPhone: currentUser?.phone || '',
+    sellerPromptPay: currentUser?.promptPay || '',
+    sellerLineId: currentUser?.lineId || '',
     sellerPassword: '', // No longer needed
   });
 
