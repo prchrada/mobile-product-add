@@ -82,38 +82,8 @@ export const signUp = async (email: string, password: string, profileData: Omit<
   return { data, error };
 };
 
-export const signInWithNameAndPhone = async (name: string, phone: string) => {
-  try {
-    // Find user by name and phone
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('name', name)
-      .eq('phone', phone)
-      .single();
-
-    if (error || !profile) {
-      return { error: { message: 'ไม่พบผู้ใช้ที่ตรงกับชื่อและเบอร์โทรที่ระบุ' } };
-    }
-
-    // Set current user manually since we're doing a quick login
-    currentUser = {
-      id: profile.user_id,
-      name: profile.name,
-      phone: profile.phone,
-      email: '', // We'll set this later when needed
-      userType: profile.user_type as 'buyer' | 'seller',
-      avatarUrl: undefined, // Will be available after avatar_url migration
-      promptPay: profile.prompt_pay || undefined,
-      lineId: profile.line_id || undefined,
-    };
-
-    return { data: profile, error: null };
-  } catch (error) {
-    console.error('Error signing in with name and phone:', error);
-    return { error: { message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' } };
-  }
-};
+// REMOVED: signInWithNameAndPhone function for security reasons
+// All authentication must go through Supabase Auth properly
 
 export const signIn = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signInWithPassword({

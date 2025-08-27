@@ -27,8 +27,17 @@ const AuthGuard = ({ children, requiredUserType }: AuthGuardProps) => {
   useEffect(() => {
     if (isLoading) return;
 
-    // If no user is logged in, redirect to login
-    if (!currentUser) {
+    // Validate session is still valid
+    const session = getCurrentSession();
+    
+    // If no user is logged in or session is invalid, redirect to login
+    if (!currentUser || !session) {
+      navigate('/login');
+      return;
+    }
+
+    // Check if session is expired
+    if (session.expires_at && new Date(session.expires_at * 1000) < new Date()) {
       navigate('/login');
       return;
     }
