@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Store, ShoppingCart, User, Phone, Mail, CreditCard, MessageSquare, Heart, Sparkles, Crown, Star, Camera } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from '@/hooks/use-toast';
-import { signUp, signIn, signInWithNameAndPhone, UserInfo } from '@/utils/userAuth';
+import { signUp, signIn, UserInfo } from '@/utils/userAuth';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -28,16 +28,16 @@ const Login = () => {
     e.preventDefault();
     
     if (isExistingUser) {
-      // Quick login for existing users
-      if (!formData.name || !formData.phone) {
+      // Secure email/password login for existing users
+      if (!formData.email || !formData.password) {
         toast({
-          title: "กรุณากรอกชื่อและเบอร์โทรศัพท์",
+          title: "กรุณากรอกอีเมลและรหัสผ่าน",
           variant: "destructive",
         });
         return;
       }
 
-      const { error } = await signInWithNameAndPhone(formData.name, formData.phone);
+      const { error } = await signIn(formData.email, formData.password);
 
       if (error) {
         toast({
@@ -50,7 +50,7 @@ const Login = () => {
 
       toast({
         title: "เข้าสู่ระบบสำเร็จ!",
-        description: `ยินดีต้อนรับกลับ ${formData.name}`,
+        description: `ยินดีต้อนรับกลับ`,
       });
 
       navigate('/');
@@ -140,14 +140,14 @@ const Login = () => {
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mr-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
                     <User className="w-8 h-8 text-white icon-glow" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-xl text-gray-900 mb-1">🔑 เข้าสู่ระบบ</h3>
-                    <p className="text-gray-600">สำหรับผู้ใช้ที่ลงทะเบียนแล้ว</p>
-                    <div className="flex items-center mt-2 text-blue-600">
-                      <Star className="w-4 h-4 mr-1" />
-                      <span className="text-sm">กรอกเพียงชื่อและเบอร์โทร</span>
+                    <div>
+                      <h3 className="font-bold text-xl text-gray-900 mb-1">🔑 เข้าสู่ระบบ</h3>
+                      <p className="text-gray-600">สำหรับผู้ใช้ที่ลงทะเบียนแล้ว</p>
+                      <div className="flex items-center mt-2 text-blue-600">
+                        <Star className="w-4 h-4 mr-1" />
+                        <span className="text-sm">ใช้อีเมลและรหัสผ่าน</span>
+                      </div>
                     </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -211,6 +211,9 @@ const Login = () => {
             <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-3">
               🔑 เข้าสู่ระบบ
             </h1>
+            <p className="text-white/80 text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+              ใช้อีเมลและรหัสผ่านเท่านั้น
+            </p>
             <Button
               variant="ghost"
               onClick={() => setIsExistingUser(false)}
@@ -223,38 +226,40 @@ const Login = () => {
           <Card className="glass-card border-white/30 rounded-3xl shadow-2xl overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white pb-6">
               <CardTitle className="text-center text-xl font-bold">
-                🚀 เข้าใช้งานง่ายๆ
+                🔐 เข้าสู่ระบบอย่างปลอดภัย
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="name" className="flex items-center text-gray-700 mb-3 font-medium">
-                    <User className="w-5 h-5 mr-2 text-primary" />
-                    ชื่อ-นามสกุล
+                  <Label htmlFor="email" className="flex items-center text-gray-700 mb-3 font-medium">
+                    <Mail className="w-5 h-5 mr-2 text-primary" />
+                    อีเมล
                   </Label>
                   <Input
-                    id="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleInputChange('name')}
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange('email')}
                     className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
-                    placeholder="กรอกชื่อ-นามสกุลของคุณ"
+                    placeholder="example@email.com"
+                    required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="phone" className="flex items-center text-gray-700 mb-3 font-medium">
-                    <Phone className="w-5 h-5 mr-2 text-primary" />
-                    เบอร์โทรศัพท์
+                  <Label htmlFor="password" className="flex items-center text-gray-700 mb-3 font-medium">
+                    <User className="w-5 h-5 mr-2 text-primary" />
+                    รหัสผ่าน
                   </Label>
                   <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleInputChange('phone')}
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleInputChange('password')}
                     className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
-                    placeholder="08x-xxx-xxxx"
+                    placeholder="รหัสผ่านของคุณ"
+                    required
                   />
                 </div>
 
