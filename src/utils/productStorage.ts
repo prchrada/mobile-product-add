@@ -13,11 +13,11 @@ export const getProducts = (): Product[] => {
   }
 };
 
-export const saveProduct = (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Product => {
+export const saveProduct = (product: Omit<Product, 'id' | 'created_at' | 'updated_at'>): Product => {
   const products = getProducts();
   const newProduct: Product = {
     ...product,
-    id: Date.now().toString(),
+    id: crypto.randomUUID(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
