@@ -57,43 +57,53 @@ const fetchUserProfile = async (userId: string) => {
 };
 
 export const signUp = async (email: string, password: string, profileData: Omit<UserInfo, 'id' | 'email'>) => {
-  const redirectUrl = `${window.location.origin}/`;
-  
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: redirectUrl,
-      data: {
-        name: profileData.name,
-        phone: profileData.phone,
-        user_type: profileData.userType,
-        prompt_pay: profileData.promptPay,
-        line_id: profileData.lineId,
-        avatar_url: profileData.avatarUrl,
+  try {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          name: profileData.name,
+          phone: profileData.phone,
+          user_type: profileData.userType,
+          prompt_pay: profileData.promptPay,
+          line_id: profileData.lineId,
+          avatar_url: profileData.avatarUrl,
+        }
       }
+    });
+
+    // If signup successful and user is immediately available, fetch profile
+    if (data.user && !error) {
+      // Wait a bit for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      await fetchUserProfile(data.user.id);
     }
-  });
 
-  // If signup successful and user is immediately available, fetch profile
-  if (data.user && !error) {
-    // Wait a bit for the trigger to create the profile
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    await fetchUserProfile(data.user.id);
+    return { data, error };
+  } catch (error) {
+    console.error('Sign up error:', error);
+    return { data: null, error: { message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง' } };
   }
-
-  return { data, error };
 };
 
 // REMOVED: signInWithNameAndPhone function for security reasons
 // All authentication must go through Supabase Auth properly
 
 export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  return { data, error };
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { data, error };
+  } catch (error) {
+    console.error('Sign in error:', error);
+    return { data: null, error: { message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง' } };
+  }
 };
 
 export const signOut = async () => {
@@ -125,9 +135,17 @@ export const isBuyer = (): boolean => {
 
 // Initialize session on app start
 export const initializeAuth = async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  currentSession = session;
-  if (session?.user) {
-    await fetchUserProfile(session.user.id);
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error('Error getting session:', error);
+      return;
+    }
+    currentSession = session;
+    if (session?.user) {
+      await fetchUserProfile(session.user.id);
+    }
+  } catch (error) {
+    console.error('Error initializing auth:', error);
   }
 };
