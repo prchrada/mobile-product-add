@@ -53,6 +53,7 @@ const Login = () => {
         description: `ยินดีต้อนรับกลับ`,
       });
 
+      // Navigate to appropriate page - let AuthGuard handle the routing
       navigate('/');
     } else {
       // Full registration for new users
