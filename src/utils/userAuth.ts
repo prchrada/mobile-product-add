@@ -18,13 +18,10 @@ let currentUser: UserInfo | null = null;
 let currentSession: Session | null = null;
 
 // Initialize auth state
-supabase.auth.onAuthStateChange((event, session) => {
+supabase.auth.onAuthStateChange(async (event, session) => {
   currentSession = session;
   if (session?.user) {
-    // Use setTimeout to prevent blocking
-    setTimeout(() => {
-      fetchUserProfile(session.user.id);
-    }, 0);
+    await fetchUserProfile(session.user.id);
   } else {
     currentUser = null;
   }
@@ -57,53 +54,66 @@ const fetchUserProfile = async (userId: string) => {
 };
 
 export const signUp = async (email: string, password: string, profileData: Omit<UserInfo, 'id' | 'email'>) => {
-  try {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          name: profileData.name,
-          phone: profileData.phone,
-          user_type: profileData.userType,
-          prompt_pay: profileData.promptPay,
-          line_id: profileData.lineId,
-          avatar_url: profileData.avatarUrl,
-        }
+  const redirectUrl = `${window.location.origin}/`;
+  
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: redirectUrl,
+      data: {
+        name: profileData.name,
+        phone: profileData.phone,
+        user_type: profileData.userType,
+        prompt_pay: profileData.promptPay,
+        line_id: profileData.lineId,
+        avatar_url: profileData.avatarUrl,
       }
-    });
+    }
+  });
 
-    // If signup successful and user is immediately available, fetch profile
-    if (data.user && !error) {
-      // Wait a bit for the trigger to create the profile
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      await fetchUserProfile(data.user.id);
+  return { data, error };
+};
+
+export const signInWithNameAndPhone = async (name: string, phone: string) => {
+  try {
+    // Find user by name and phone
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('name', name)
+      .eq('phone', phone)
+      .single();
+
+    if (error || !profile) {
+      return { error: { message: 'ไม่พบผู้ใช้ที่ตรงกับชื่อและเบอร์โทรที่ระบุ' } };
     }
 
-    return { data, error };
+    // Set current user manually since we're doing a quick login
+    currentUser = {
+      id: profile.user_id,
+      name: profile.name,
+      phone: profile.phone,
+      email: '', // We'll set this later when needed
+      userType: profile.user_type as 'buyer' | 'seller',
+      avatarUrl: undefined, // Will be available after avatar_url migration
+      promptPay: profile.prompt_pay || undefined,
+      lineId: profile.line_id || undefined,
+    };
+
+    return { data: profile, error: null };
   } catch (error) {
-    console.error('Sign up error:', error);
-    return { data: null, error: { message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง' } };
+    console.error('Error signing in with name and phone:', error);
+    return { error: { message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' } };
   }
 };
 
-// REMOVED: signInWithNameAndPhone function for security reasons
-// All authentication must go through Supabase Auth properly
-
 export const signIn = async (email: string, password: string) => {
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { data, error };
-  } catch (error) {
-    console.error('Sign in error:', error);
-    return { data: null, error: { message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง' } };
-  }
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  return { data, error };
 };
 
 export const signOut = async () => {
@@ -135,17 +145,9 @@ export const isBuyer = (): boolean => {
 
 // Initialize session on app start
 export const initializeAuth = async () => {
-  try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    if (error) {
-      console.error('Error getting session:', error);
-      return;
-    }
-    currentSession = session;
-    if (session?.user) {
-      await fetchUserProfile(session.user.id);
-    }
-  } catch (error) {
-    console.error('Error initializing auth:', error);
+  const { data: { session } } = await supabase.auth.getSession();
+  currentSession = session;
+  if (session?.user) {
+    await fetchUserProfile(session.user.id);
   }
 };
