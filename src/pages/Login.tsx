@@ -8,12 +8,13 @@ import { useNavigate } from 'react-router-dom';
 import { Store, ShoppingCart, User, Phone, Mail, CreditCard, MessageSquare, Heart, Sparkles, Crown, Star, Camera } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from '@/hooks/use-toast';
-import { signUp, signIn, signInWithNameAndPhone, UserInfo } from '@/utils/userAuth';
+import { signUp, signIn, UserInfo } from '@/utils/userAuth';
 
 const Login = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState<'buyer' | 'seller' | null>(null);
   const [isExistingUser, setIsExistingUser] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -24,33 +25,65 @@ const Login = () => {
     avatarUrl: ''
   });
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password: string): boolean => {
+    // ตรวจสอบรหัสผ่าน: ต้องมีความยาวอย่างน้อย 6 ตัวอักษร
+    return password.length >= 6;
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    // ตรวจสอบเบอร์โทรไทย: เริ่มต้นด้วย 08 หรือ 09 และมี 10 หลัก
+    const phoneRegex = /^(08|09)\d{8}$/;
+    return phoneRegex.test(phone);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     if (isExistingUser) {
-      // Quick login for existing users
-      if (!formData.name || !formData.phone) {
+      // Login for existing users with email and password
+      if (!formData.email || !formData.password) {
         toast({
-          title: "กรุณากรอกชื่อและเบอร์โทรศัพท์",
+          title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+          description: "กรุณากรอกอีเมลและรหัสผ่าน",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
-      const { error } = await signInWithNameAndPhone(formData.name, formData.phone);
+      if (!validateEmail(formData.email)) {
+        toast({
+          title: "รูปแบบอีเมลไม่ถูกต้อง",
+          description: "กรุณากรอกอีเมลในรูปแบบที่ถูกต้อง เช่น example@email.com",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const { data, error } = await signIn(formData.email, formData.password);
 
       if (error) {
         toast({
           title: "เข้าสู่ระบบไม่สำเร็จ",
-          description: error.message,
+          description: error.message === 'Invalid login credentials' 
+            ? "อีเมลหรือรหัสผ่านไม่ถูกต้อง" 
+            : error.message,
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
       toast({
         title: "เข้าสู่ระบบสำเร็จ!",
-        description: `ยินดีต้อนรับกลับ ${formData.name}`,
+        description: "ยินดีต้อนรับกลับ",
       });
 
       navigate('/');
@@ -59,16 +92,53 @@ const Login = () => {
       if (!formData.name || !formData.phone || !formData.email || !formData.password) {
         toast({
           title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+          description: "กรุณากรอกข้อมูลทุกช่อง",
           variant: "destructive",
         });
+        setIsLoading(false);
+        return;
+      }
+
+      // ตรวจสอบรูปแบบอีเมล
+      if (!validateEmail(formData.email)) {
+        toast({
+          title: "รูปแบบอีเมลไม่ถูกต้อง",
+          description: "กรุณากรอกอีเมลในรูปแบบที่ถูกต้อง เช่น example@email.com",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // ตรวจสอบรหัสผ่าน
+      if (!validatePassword(formData.password)) {
+        toast({
+          title: "รหัสผ่านไม่ถูกต้อง",
+          description: "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // ตรวจสอบเบอร์โทรศัพท์
+      if (!validatePhone(formData.phone)) {
+        toast({
+          title: "เบอร์โทรศัพท์ไม่ถูกต้อง",
+          description: "กรุณากรอกเบอร์โทรศัพท์ไทยในรูปแบบ 08x-xxx-xxxx หรือ 09x-xxx-xxxx",
+          variant: "destructive",
+        });
+        setIsLoading(false);
         return;
       }
 
       if (userType === 'seller' && (!formData.promptPay || !formData.lineId)) {
         toast({
           title: "กรุณากรอกข้อมูลผู้ขายให้ครบถ้วน",
+          description: "กรุณากรอกข้อมูลพร้อมเพย์และไลน์ไอดี",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
@@ -84,11 +154,23 @@ const Login = () => {
       const { error } = await signUp(formData.email, formData.password, profileData);
 
       if (error) {
+        let errorMessage = error.message;
+        
+        // แปลข้อความ error ให้เป็นภาษาไทย
+        if (error.message.includes('User already registered')) {
+          errorMessage = "อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น";
+        } else if (error.message.includes('Password should be at least 6 characters')) {
+          errorMessage = "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = "รูปแบบอีเมลไม่ถูกต้อง";
+        }
+
         toast({
           title: "เกิดข้อผิดพลาด",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
@@ -104,6 +186,8 @@ const Login = () => {
         navigate('/sales');
       }
     }
+    
+    setIsLoading(false);
   };
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +214,7 @@ const Login = () => {
           </div>
 
           <div className="space-y-6">
-            {/* Quick Login for Existing Users */}
+            {/* Login for Existing Users */}
             <Card 
               className="glass-card cursor-pointer card-hover rounded-3xl overflow-hidden border-white/30 group"
               onClick={() => setIsExistingUser(true)}
@@ -145,7 +229,7 @@ const Login = () => {
                     <p className="text-gray-600">สำหรับผู้ใช้ที่ลงทะเบียนแล้ว</p>
                     <div className="flex items-center mt-2 text-blue-600">
                       <Star className="w-4 h-4 mr-1" />
-                      <span className="text-sm">กรอกเพียงชื่อและเบอร์โทร</span>
+                      <span className="text-sm">ใช้อีเมลและรหัสผ่าน</span>
                     </div>
                   </div>
                 </div>
@@ -229,40 +313,44 @@ const Login = () => {
             <CardContent className="p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="name" className="flex items-center text-gray-700 mb-3 font-medium">
-                    <User className="w-5 h-5 mr-2 text-primary" />
-                    ชื่อ-นามสกุล
+                  <Label htmlFor="email" className="flex items-center text-gray-700 mb-3 font-medium">
+                    <Mail className="w-5 h-5 mr-2 text-primary" />
+                    อีเมล
                   </Label>
                   <Input
-                    id="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleInputChange('name')}
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange('email')}
                     className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
-                    placeholder="กรอกชื่อ-นามสกุลของคุณ"
+                    placeholder="example@email.com"
+                    required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="phone" className="flex items-center text-gray-700 mb-3 font-medium">
-                    <Phone className="w-5 h-5 mr-2 text-primary" />
-                    เบอร์โทรศัพท์
+                  <Label htmlFor="password" className="flex items-center text-gray-700 mb-3 font-medium">
+                    <User className="w-5 h-5 mr-2 text-primary" />
+                    รหัสผ่าน
                   </Label>
                   <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleInputChange('phone')}
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleInputChange('password')}
                     className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
-                    placeholder="08x-xxx-xxxx"
+                    placeholder="รหัสผ่าน"
+                    required
+                    minLength={6}
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full py-6 rounded-3xl text-xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 hover:scale-105 text-white"
+                  disabled={isLoading}
+                  className="w-full py-6 rounded-3xl text-xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 hover:scale-105 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  🚀 เข้าสู่ระบบ
+                  {isLoading ? '⏳ กำลังเข้าสู่ระบบ...' : '🚀 เข้าสู่ระบบ'}
                 </Button>
               </form>
             </CardContent>
@@ -349,14 +437,17 @@ const Login = () => {
                   <Phone className="w-5 h-5 mr-2 text-primary" />
                   เบอร์โทรศัพท์
                 </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleInputChange('phone')}
-                  className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
-                  placeholder="08x-xxx-xxxx"
-                />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange('phone')}
+                    className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
+                    placeholder="08x-xxx-xxxx"
+                    pattern="(08|09)[0-9]{8}"
+                    title="เบอร์โทรศัพท์ไทย เช่น 081-234-5678"
+                    required
+                  />
               </div>
 
               <div>
@@ -364,14 +455,15 @@ const Login = () => {
                   <Mail className="w-5 h-5 mr-2 text-primary" />
                   อีเมล
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange('email')}
-                  className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
-                  placeholder="example@email.com"
-                />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange('email')}
+                    className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
+                    placeholder="example@email.com"
+                    required
+                  />
               </div>
 
               <div>
@@ -379,14 +471,16 @@ const Login = () => {
                   <User className="w-5 h-5 mr-2 text-primary" />
                   รหัสผ่าน
                 </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleInputChange('password')}
-                  className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
-                  placeholder="รหัสผ่าน"
-                />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleInputChange('password')}
+                    className="rounded-2xl border-gray-200 focus:border-primary h-12 text-lg"
+                    placeholder="รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)"
+                    required
+                    minLength={6}
+                  />
               </div>
 
               {userType === 'seller' && (
@@ -431,16 +525,22 @@ const Login = () => {
                 </>
               )}
 
-              <Button
-                type="submit"
-                className={`w-full py-6 rounded-3xl text-xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 ${
-                  userType === 'seller'
-                    ? 'hero-gradient hover:scale-105'
-                    : 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 hover:scale-105'
-                } text-white`}
-              >
-                {userType === 'seller' ? '🚀 เริ่มขายสินค้า' : '🎉 เริ่มช็อปปิ้ง'}
-              </Button>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`w-full py-6 rounded-3xl text-xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 ${
+                    userType === 'seller'
+                      ? 'hero-gradient hover:scale-105'
+                      : 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 hover:scale-105'
+                  } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {isLoading 
+                    ? '⏳ กำลังลงทะเบียน...' 
+                    : userType === 'seller' 
+                      ? '🚀 เริ่มขายสินค้า' 
+                      : '🎉 เริ่มช็อปปิ้ง'
+                  }
+                </Button>
             </form>
           </CardContent>
         </Card>
