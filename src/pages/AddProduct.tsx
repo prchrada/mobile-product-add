@@ -27,7 +27,7 @@ const AddProduct = () => {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
-        category: 'ทั่วไป',
+        category: formData.category || 'ทั่วไป',
         quantity: parseInt(formData.quantity),
         image_url: formData.imageUrl || null,
       };
