@@ -180,11 +180,8 @@ const Login = () => {
       });
 
       // Navigate to appropriate page based on user type
-      if (userType === 'seller') {
-        navigate('/products');
-      } else {
-        navigate('/sales');
-      }
+      // Always redirect to main usage page after registration
+      navigate('/');
     }
     
     setIsLoading(false);
