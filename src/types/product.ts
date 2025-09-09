@@ -1,10 +1,56 @@
 
-// Use Supabase types for consistency
-import type { Database } from '@/integrations/supabase/types';
+// Temporary local types until Supabase types auto-update
+export interface Profile {
+  id: string;
+  user_id: string;
+  name: string;
+  phone: string;
+  user_type: string;
+  prompt_pay?: string | null;
+  line_id?: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
-export type Product = Database['public']['Tables']['products']['Row'];
-export type ProductInsert = Database['public']['Tables']['products']['Insert'];
-export type ProductUpdate = Database['public']['Tables']['products']['Update'];
+// Temporary local types until Supabase types auto-update
+export interface Product {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  quantity: number;
+  image_url?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProductInsert {
+  id?: string;
+  user_id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  quantity?: number;
+  image_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProductUpdate {
+  id?: string;
+  user_id?: string;
+  name?: string;
+  description?: string;
+  price?: number;
+  category?: string;
+  quantity?: number;
+  image_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
 
 export interface ProductFormData {
   name: string;

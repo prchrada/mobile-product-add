@@ -1,12 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { ProductFormData } from '@/types/product';
+import { ProductFormData, Product } from '@/types/product';
 import { getUserProducts, deleteProduct, updateProduct } from '@/utils/productSupabase';
 import { getCurrentUser } from '@/utils/userAuth';
 import { toast } from '@/hooks/use-toast';
-import type { Database } from '@/integrations/supabase/types';
-
-type Product = Database['public']['Tables']['products']['Row'];
 
 export const useProductsData = () => {
   const [products, setProducts] = useState<Product[]>([]);

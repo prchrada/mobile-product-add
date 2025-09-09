@@ -1,9 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
-
-type Product = Database['public']['Tables']['products']['Row'];
-type ProductInsert = Database['public']['Tables']['products']['Insert'];
-type ProductUpdate = Database['public']['Tables']['products']['Update'];
+import type { Product, ProductInsert, ProductUpdate } from '@/types/product';
 
 export const getProducts = async (): Promise<Product[]> => {
   try {

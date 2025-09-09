@@ -1,10 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import ProductForm from '@/components/ProductForm';
-import { ProductFormData } from '@/types/product';
-import type { Database } from '@/integrations/supabase/types';
-
-type Product = Database['public']['Tables']['products']['Row'];
+import { ProductFormData, Product } from '@/types/product';
 
 interface ProductEditFormProps {
   editingProduct: Product;

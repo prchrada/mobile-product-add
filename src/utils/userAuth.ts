@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
+import type { Profile } from '@/types/product';
 
 export interface UserInfo {
   id: string;
@@ -41,15 +42,16 @@ const fetchUserProfile = async (userId: string) => {
       .single();
     
     if (profile) {
+      const profileData = profile as Profile;
       currentUser = {
-        id: profile.user_id,
-        name: profile.name,
-        phone: profile.phone,
+        id: profileData.user_id,
+        name: profileData.name,
+        phone: profileData.phone,
         email: currentSession?.user?.email || '',
-        userType: profile.user_type as 'buyer' | 'seller',
+        userType: profileData.user_type as 'buyer' | 'seller',
         avatarUrl: undefined, // Will be available after avatar_url migration
-        promptPay: profile.prompt_pay || undefined,
-        lineId: profile.line_id || undefined,
+        promptPay: profileData.prompt_pay || undefined,
+        lineId: profileData.line_id || undefined,
       };
     }
   } catch (error) {
