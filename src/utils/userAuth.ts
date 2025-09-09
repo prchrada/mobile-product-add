@@ -18,10 +18,15 @@ let currentUser: UserInfo | null = null;
 let currentSession: Session | null = null;
 
 // Initialize auth state
-supabase.auth.onAuthStateChange(async (event, session) => {
+supabase.auth.onAuthStateChange((event, session) => {
+  // Only synchronous state updates here to prevent deadlocks
   currentSession = session;
+  
   if (session?.user) {
-    await fetchUserProfile(session.user.id);
+    // Defer Supabase calls with setTimeout to prevent auth deadlock
+    setTimeout(() => {
+      fetchUserProfile(session.user.id);
+    }, 0);
   } else {
     currentUser = null;
   }
