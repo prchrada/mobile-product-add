@@ -20,8 +20,12 @@ const Index = () => {
       return;
     }
 
+    // Add a small delay to ensure auth state is fully initialized
     const loadProducts = async () => {
       try {
+        // Wait a bit to ensure authentication is fully initialized
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const loadedProducts = await getProducts();
         // If seller, show only their products
         if (isSeller()) {
