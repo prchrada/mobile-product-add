@@ -10,101 +10,17 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
-      products: {
-        Row: {
-          category: string
-          created_at: string
-          description: string
-          id: string
-          image_url: string | null
-          name: string
-          price: number
-          quantity: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          category: string
-          created_at?: string
-          description: string
-          id?: string
-          image_url?: string | null
-          name: string
-          price: number
-          quantity?: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          category?: string
-          created_at?: string
-          description?: string
-          id?: string
-          image_url?: string | null
-          name?: string
-          price?: number
-          quantity?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          created_at: string
-          id: string
-          line_id: string | null
-          name: string
-          phone: string
-          prompt_pay: string | null
-          updated_at: string
-          user_id: string
-          user_type: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          line_id?: string | null
-          name: string
-          phone: string
-          prompt_pay?: string | null
-          updated_at?: string
-          user_id: string
-          user_type: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          line_id?: string | null
-          name?: string
-          phone?: string
-          prompt_pay?: string | null
-          updated_at?: string
-          user_id?: string
-          user_type?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_current_user_profile: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          line_id: string
-          name: string
-          phone: string
-          prompt_pay: string
-          user_id: string
-          user_type: string
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
