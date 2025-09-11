@@ -48,7 +48,7 @@ const AddProduct = () => {
       formData.append('image', productData.image);
     }
 
-    const response = await fetch('/api/products', {
+    const response = await fetch('http://localhost:3000/api/products', { // แก้ไข URL ให้ตรงกับ backend
       method: 'POST',
       body: formData,
     });
