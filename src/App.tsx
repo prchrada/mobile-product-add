@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +14,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
+import SellerDashboard from "./pages/SellerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -62,11 +62,31 @@ const App = () => (
               <Orders />
             </AuthGuard>
           } />
+          <Route path="/seller-dashboard" element={
+            <AuthGuard requiredUserType="seller">
+              <SellerDashboard />
+            </AuthGuard>
+          } />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
+
+// Update the login redirect
+if (data?.user?.user_metadata?.userType === 'seller') {
+  navigate('/seller-dashboard'); // Changed from /products to /seller-dashboard
+} else if (data?.user?.user_metadata?.userType === 'buyer') {
+  navigate('/sales');
+}
+
+// Update the registration redirect
+// Inside the else block after successful registration
+if (userType === 'seller') {
+  navigate('/seller-dashboard'); // Changed from /products to /seller-dashboard
+} else if (userType === 'buyer') {
+  navigate('/sales');
+}
 
 export default App;
