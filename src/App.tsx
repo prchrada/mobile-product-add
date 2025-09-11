@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +14,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
+import SellerDashboard from "./pages/SellerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +27,11 @@ const App = () => (
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Home />} />
+          <Route path="/seller-dashboard" element={
+            <AuthGuard requiredUserType="seller">
+              <SellerDashboard />
+            </AuthGuard>
+          } />
           <Route path="/dashboard" element={
             <AuthGuard>
               <Index />
