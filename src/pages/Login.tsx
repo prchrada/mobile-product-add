@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Store, ShoppingCart, User, Phone, Mail, CreditCard, MessageSquare, Heart, Sparkles, Crown, Star, Camera } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from '@/hooks/use-toast';
@@ -11,11 +12,8 @@ import { signUp, signIn, UserInfo } from '@/utils/userAuth';
 
 const Login = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isExistingUser: defaultIsExisting, userType: defaultUserType } = location.state || {};
-
-  const [userType, setUserType] = useState<'buyer' | 'seller' | null>(defaultUserType || null);
-  const [isExistingUser, setIsExistingUser] = useState(defaultIsExisting || false);
+  const [userType, setUserType] = useState<'buyer' | 'seller' | null>(null);
+  const [isExistingUser, setIsExistingUser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -26,16 +24,6 @@ const Login = () => {
     lineId: '',
     avatarUrl: ''
   });
-
-  useEffect(() => {
-    // Set initial states based on navigation params
-    if (defaultIsExisting !== undefined) {
-      setIsExistingUser(defaultIsExisting);
-    }
-    if (defaultUserType) {
-      setUserType(defaultUserType);
-    }
-  }, [defaultIsExisting, defaultUserType]);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,12 +86,7 @@ const Login = () => {
         description: "ยินดีต้อนรับกลับ",
       });
 
-      // Redirect based on user type
-      if (data?.user?.user_metadata?.userType === 'seller') {
-        navigate('/products');
-      } else if (data?.user?.user_metadata?.userType === 'buyer') {
-        navigate('/sales');
-      }
+      navigate('/');
     } else {
       // Full registration for new users
       if (!formData.name || !formData.phone || !formData.email || !formData.password) {
@@ -196,12 +179,9 @@ const Login = () => {
         description: `ยินดีต้อนรับ ${profileData.name}`,
       });
 
-      // Navigate based on user type after registration
-      if (userType === 'seller') {
-        navigate('/products');
-      } else if (userType === 'buyer') {
-        navigate('/sales');
-      }
+      // Navigate to appropriate page based on user type
+      // Always redirect to main usage page after registration
+      navigate('/');
     }
     
     setIsLoading(false);
@@ -242,13 +222,12 @@ const Login = () => {
                     <User className="w-8 h-8 text-white icon-glow" />
                   </div>
                   <div>
-                    <div className="flex items-center">
+                    <h3 className="font-bold text-xl text-gray-900 mb-1">🔑 เข้าสู่ระบบ</h3>
+                    <p className="text-gray-600">สำหรับผู้ใช้ที่ลงทะเบียนแล้ว</p>
+                    <div className="flex items-center mt-2 text-blue-600">
                       <Star className="w-4 h-4 mr-1" />
-                      <h3 className="text-lg font-semibold">เข้าสู่ระบบ</h3>
+                      <span className="text-sm">ใช้อีเมลและรหัสผ่าน</span>
                     </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      สำหรับผู้ใช้ที่มีบัญชีอยู่แล้ว
-                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -264,13 +243,12 @@ const Login = () => {
                     <Heart className="w-8 h-8 text-white icon-glow" />
                   </div>
                   <div>
-                    <div className="flex items-center">
-                      <Heart className="w-4 h-4 mr-1" />
-                      <h3 className="text-lg font-semibold">ลงทะเบียนผู้ซื้อ</h3>
+                    <h3 className="font-bold text-xl text-gray-900 mb-1">💖 ลงทะเบียนผู้ซื้อ</h3>
+                    <p className="text-gray-600">ค้นหาและซื้อสินค้าที่ชื่นชอบ</p>
+                    <div className="flex items-center mt-2 text-pink-600">
+                      <Star className="w-4 h-4 mr-1" />
+                      <span className="text-sm">เริ่มช็อปปิ้งได้เลย!</span>
                     </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      สำหรับผู้ที่ต้องการซื้อสินค้า
-                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -286,13 +264,12 @@ const Login = () => {
                     <Crown className="w-8 h-8 text-white icon-glow" />
                   </div>
                   <div>
-                    <div className="flex items-center">
-                      <Crown className="w-4 h-4 mr-1" />
-                      <h3 className="text-lg font-semibold">ลงทะเบียนผู้ขาย</h3>
+                    <h3 className="font-bold text-xl text-gray-900 mb-1">✨ ลงทะเบียนผู้ขาย</h3>
+                    <p className="text-gray-600">เพิ่มและจัดการสินค้าของคุณ</p>
+                    <div className="flex items-center mt-2 text-purple-600">
+                      <Sparkles className="w-4 h-4 mr-1" />
+                      <span className="text-sm">สร้างร้านค้าออนไลน์!</span>
                     </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      สำหรับผู้ที่ต้องการขายสินค้า
-                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -570,4 +547,3 @@ const Login = () => {
 };
 
 export default Login;
-//5555
