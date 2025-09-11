@@ -100,7 +100,7 @@ const Login = () => {
 
       // Redirect based on user type
       if (data?.user?.user_metadata?.userType === 'seller') {
-        navigate('/products');
+        navigate('/seller-dashboard'); // Changed from /products to /seller-dashboard
       } else if (data?.user?.user_metadata?.userType === 'buyer') {
         navigate('/sales');
       }
@@ -198,7 +198,7 @@ const Login = () => {
 
       // Navigate based on user type after registration
       if (userType === 'seller') {
-        navigate('/products');
+        navigate('/seller-dashboard'); // Changed from /products to /seller-dashboard
       } else if (userType === 'buyer') {
         navigate('/sales');
       }
