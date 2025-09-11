@@ -1,59 +1,82 @@
-
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
-import ProductForm from '@/components/ProductForm';
-import { ProductFormData } from '@/types/product';
-import { saveProduct } from '@/utils/productSupabase';
-import { getCurrentUser } from '@/utils/userAuth';
+import { addProduct } from '../services/productService';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
 
 const AddProduct = () => {
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
+  const [product, setProduct] = useState({
+    name: '',
+    price: 0,
+    description: '',
+    image: ''
+  });
 
-  const handleSubmit = async (formData: ProductFormData) => {
-    if (!currentUser) {
+  const mutation = useMutation({
+    mutationFn: addProduct,
+    onSuccess: () => {
       toast({
-        title: "เกิดข้อผิดพลาด",
-        description: "กรุณาเข้าสู่ระบบใหม่",
-        variant: "destructive",
+        title: "สำเร็จ",
+        description: "เพิ่มสินค้าเรียบร้อยแล้ว",
       });
-      navigate('/login');
-      return;
-    }
-
-    try {
-      const productData = {
-        user_id: currentUser.id,
-        name: formData.name,
-        description: formData.description,
-        price: parseFloat(formData.price),
-        category: formData.category || 'ทั่วไป',
-        quantity: parseInt(formData.quantity),
-        image_url: formData.imageUrl || null,
-      };
-
-      const newProduct = await saveProduct(productData);
-      
-      if (newProduct) {
-        toast({
-          title: "เพิ่มสินค้าสำเร็จ!",
-          description: `เพิ่มสินค้า "${newProduct.name}" เรียบร้อยแล้ว`,
-        });
-        navigate('/products');
-      } else {
-        throw new Error('Failed to save product');
-      }
-    } catch (error) {
-      console.error('Error saving product:', error);
+      navigate('/products');
+    },
+    onError: () => {
       toast({
-        title: "เกิดข้อผิดพลาด",
-        description: "ไม่สามารถเพิ่มสินค้าได้ กรุณาลองใหม่อีกครั้ง",
-        variant: "destructive",
+        title: "ผิดพลาด",
+        description: "ไม่สามารถเพิ่มสินค้าได้",
+        variant: "destructive"
       });
     }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate(product);
   };
 
-  return <ProductForm onSubmit={handleSubmit} />;
+  return (
+    <div className="max-w-md mx-auto p-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          placeholder="ชื่อสินค้า"
+          value={product.name}
+          onChange={(e) => setProduct({...product, name: e.target.value})}
+          required
+        />
+        <Input
+          type="number"
+          placeholder="ราคา"
+          value={product.price}
+          onChange={(e) => setProduct({...product, price: Number(e.target.value)})}
+          required
+        />
+        <Input
+          placeholder="รายละเอียด"
+          value={product.description}
+          onChange={(e) => setProduct({...product, description: e.target.value})}
+          required
+        />
+        <Input
+          type="url"
+          placeholder="URL รูปภาพ"
+          value={product.image}
+          onChange={(e) => setProduct({...product, image: e.target.value})}
+          required
+        />
+        <Button 
+          type="submit" 
+          className="w-full"
+          disabled={mutation.isPending}
+        >
+          {mutation.isPending ? 'กำลังเพิ่มสินค้า...' : 'เพิ่มสินค้า'}
+        </Button>
+      </form>
+    </div>
+  );
 };
 
 export default AddProduct;
