@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -192,6 +191,15 @@ const Login = () => {
       ...prev,
       [field]: e.target.value
     }));
+  };
+
+  // ในส่วนที่ทำการ login หรือสมัครสมาชิกสำเร็จ
+  const handleSuccess = (userType: string) => {
+    if (userType === "seller") {
+      navigate("/seller-dashboard");
+    } else if (userType === "buyer") {
+      navigate("/sales");  // เปลี่ยนจาก /dashboard เป็น /sales สำหรับผู้ซื้อ
+    }
   };
 
   if (!userType && !isExistingUser) {
