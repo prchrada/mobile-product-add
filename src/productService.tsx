@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 interface Product {
   name: string;
   price: number;
@@ -8,10 +6,17 @@ interface Product {
 }
 
 export const addProduct = async (product: Product) => {
-  try {
-    const response = await axios.post('/api/products', product);
-    return response.data;
-  } catch (error) {
-    throw new Error('Failed to add product');
+  const response = await fetch('/api/products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(product)
+  });
+
+  if (!response.ok) {
+    throw new Error('ไม่สามารถเพิ่มสินค้าได้');
   }
+
+  return response.json();
 };
