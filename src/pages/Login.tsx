@@ -43,7 +43,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     if (isExistingUser) {
       // Login for existing users with email and password
       if (!formData.email || !formData.password) {
@@ -141,16 +141,28 @@ const Login = () => {
         return;
       }
 
+      // ทำความสะอาดข้อมูลก่อนส่ง
+      const cleanedName = formData.name.trim();
+      if (!cleanedName) {
+        toast({
+          title: "กรุณากรอกชื่อ",
+          description: "ชื่อไม่สามารถเป็นค่าว่างได้",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const profileData: Omit<UserInfo, 'id' | 'email'> = {
-        name: formData.name,
-        phone: formData.phone,
+        name: cleanedName, // ใช้ชื่อที่ทำความสะอาดแล้ว
+        phone: formData.phone.trim(),
         userType: userType!,
         avatarUrl: formData.avatarUrl,
-        promptPay: userType === 'seller' ? formData.promptPay : undefined,
-        lineId: userType === 'seller' ? formData.lineId : undefined,
+        promptPay: userType === 'seller' ? formData.promptPay.trim() : undefined,
+        lineId: userType === 'seller' ? formData.lineId.trim() : undefined,
       };
 
-      const { error } = await signUp(formData.email, formData.password, profileData);
+      const { data, error } = await signUp(formData.email.trim(), formData.password, profileData);
 
       if (error) {
         let errorMessage = error.message;
@@ -171,16 +183,15 @@ const Login = () => {
         });
         setIsLoading(false);
         return;
+      } else if (data) {
+        toast({
+          title: "ลงทะเบียนสำเร็จ!",
+          description: `ยินดีต้อนรับ ${cleanedName}`,
+        });
+
+        // เรียกใช้ handleSuccess เพื่อนำทางไปยังหน้าที่เหมาะสม
+        handleSuccess(userType!);
       }
-
-      toast({
-        title: "ลงทะเบียนสำเร็จ!",
-        description: `ยินดีต้อนรับ ${profileData.name}`,
-      });
-
-      // Navigate to appropriate page based on user type
-      // Always redirect to main usage page after registration
-      navigate('/');
     }
     
     setIsLoading(false);
