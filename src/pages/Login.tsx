@@ -209,7 +209,9 @@ const Login = () => {
     if (userType === "seller") {
       navigate("/seller-dashboard");
     } else if (userType === "buyer") {
-      navigate("/sales");  // เปลี่ยนจาก /dashboard เป็น /sales สำหรับผู้ซื้อ
+      navigate("/sales");
+    } else {
+      navigate("/"); // fallback route
     }
   };
 
