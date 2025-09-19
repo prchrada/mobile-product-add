@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { Package, Plus, ShoppingCart, ClipboardList, Eye, LogOut, User, Store, Sparkles, TrendingUp, Heart, Star, Crown } from 'lucide-react';
 import { Product } from '@/types/product';
-import { getProducts } from '@/utils/productSupabase';
+import { getProducts, getUserProducts } from '@/utils/productSupabase';
 import { getCurrentUser, signOut, isSeller, isBuyer } from '@/utils/userAuth';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -17,7 +18,16 @@ const Home = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const loadedProducts = await getProducts();
+        const { data: { session } } =  await supabase.auth.getSession() 
+        let loadedProducts
+        if (session) {
+          // ถ้าเข้าใช้งาน แสดงสินค้าของผู้ใช้งานนั้นเท่านั้น
+          loadedProducts = await getUserProducts(session.user.id);
+        } else {
+          // ถ้าไม่ได้เข้าใช้งาน แสดงสินค้าทั้งหมด
+          loadedProducts = await getProducts();
+        }
+        
         // แสดงสินค้าทั้งหมดสำหรับคนที่ยังไม่ได้ล็อกอิน
         setProducts(loadedProducts.slice(0, 8));
       } catch (error) {
@@ -221,7 +231,7 @@ const Home = () => {
                           {formatPrice(product.price)}
                         </div>
                         <div className="text-primary font-semibold text-sm bg-primary/10 px-3 py-1 rounded-full">
-                          {product.quantity} ชิ้น
+                          {product.stock} ชิ้น
                         </div>
                       </div>
                       
