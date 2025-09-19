@@ -15,28 +15,24 @@ export interface Profile {
 // Temporary local types until Supabase types auto-update
 export interface Product {
   id: string;
-  user_id: string;
+  seller_id: string;
   name: string;
   description: string;
   price: number;
-  category: string;
-  quantity: number;
+  stock: number;
   image_url?: string | null;
   created_at: string;
-  updated_at: string;
 }
 
 export interface ProductInsert {
-  id?: string;
-  user_id: string;
+  id: string;
+  seller_id: string;
   name: string;
   description: string;
   price: number;
-  category: string;
-  quantity?: number;
-  image_url?: string | null;
-  created_at?: string;
-  updated_at?: string;
+  stock: number;
+  image: File;
+  created_at: string;
 }
 
 export interface ProductUpdate {
