@@ -6,16 +6,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
+import { addProductService } from '@/productService';
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string>('');
   const [product, setProduct] = useState({
+    id: '',
+    seller_id: '',
     name: '',
-    price: '',
     description: '',
-    image: null as File | null
+    price: 0,
+    stock: 0,
+    image: null as File | null,
+    image_url: '',
+    created_at: '',
   });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,24 +46,7 @@ const AddProduct = () => {
   };
 
   const addProduct = async (productData: typeof product) => {
-    const formData = new FormData();
-    formData.append('name', productData.name);
-    formData.append('price', productData.price);
-    formData.append('description', productData.description);
-    if (productData.image) {
-      formData.append('image', productData.image);
-    }
-
-    const response = await fetch('http://localhost:3000/api/products', { // แก้ไข URL ให้ตรงกับ backend
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error('ไม่สามารถเพิ่มสินค้าได้');
-    }
-
-    return response.json();
+    await addProductService(productData)
   };
 
   const mutation = useMutation({
@@ -119,7 +108,7 @@ const AddProduct = () => {
                   type="number"
                   placeholder="ระบุราคา"
                   value={product.price}
-                  onChange={(e) => setProduct({...product, price: e.target.value})}
+                  onChange={(e) => setProduct({...product, price: Number(e.target.value)})}
                   required
                   min="0"
                   step="0.01"
